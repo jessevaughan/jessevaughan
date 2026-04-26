@@ -18,14 +18,11 @@ jobs:
       - run: npm run build
 
       - name: Deploy to DreamHost
-        env:
-          SSH_KEY: ${{ secrets.DREAMHOST_SSH_KEY }}
-        run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_KEY" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -v ${{ secrets.DREAMHOST_HOST }} >> ~/.ssh/known_hosts
-          ssh -i ~/.ssh/deploy_key -v ${{ secrets.DREAMHOST_USER }}@${{ secrets.DREAMHOST_HOST }} "echo connected"
-          rsync -avz --delete dist/ \
-            -e "ssh -i ~/.ssh/deploy_key" \
-            ${{ secrets.DREAMHOST_USER }}@${{ secrets.DREAMHOST_HOST }}:${{ secrets.DREAMHOST_PATH }}/
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.DREAMHOST_HOST }}
+          username: ${{ secrets.DREAMHOST_USER }}
+          password: ${{ secrets.DREAMHOST_PASSWORD }}
+          protocol: ftps
+          local-dir: ./dist/
+          server-dir: ${{ secrets.DREAMHOST_PATH }}/
