@@ -1,3 +1,9 @@
+// customize before import
+$primary: #c8441a;
+$family-sans-serif: 'DM Mono', monospace;
+
+@import 'bulma/bulma';
+
 *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;

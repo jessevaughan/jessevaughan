@@ -1,13 +1,71 @@
 ---
 import '../styles/global.scss';
-const { title } = Astro.props;
+
+const {
+  title = "Jesse Vaughan — Creative Director & Design Engineer",
+  description = "Jesse Vaughan is a Creative Director and Design Engineer specializing in brand, web, and interactive work at the intersection of design systems and frontend development.",
+  url = "https://www.jessevaughan.com",
+  image = "https://www.jessevaughan.com/og-image.jpg",
+} = Astro.props;
 ---
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Primary -->
   <title>{title}</title>
+  <meta name="description" content={description} />
+  <meta name="author" content="Jesse Vaughan" />
+  <link rel="canonical" href={url} />
+
+  <!-- Open Graph (LinkedIn, Facebook, iMessage) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={url} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:image" content={image} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:site_name" content="Jesse Vaughan" />
+
+  <!-- Twitter/X card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={image} />
+
+  <!-- Structured data (JSON-LD) -->
+  <script type="application/ld+json">
+    {JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Jesse Vaughan",
+      "url": "https://www.jessevaughan.com",
+      "email": "jesse.s.vaughan@gmail.com",
+      "jobTitle": "Creative Director & Design Engineer",
+      "sameAs": [
+        "https://www.linkedin.com/in/jessesvaughan/"
+      ],
+      "description": description
+    })}
+  </script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+
+  <!-- Google Analytics -->
+  <!-- Replace G-XXXXXXXXXX with your Measurement ID -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
 </head>
 <body>
   <slot />
