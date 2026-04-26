@@ -1,4 +1,5 @@
 @import "bulma/css/bulma.min.css";
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
 
 *,
 *::before,
@@ -253,5 +254,84 @@ footer {
 
   .disciplines {
     display: none;
+  }
+}
+
+.wildcard-link {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.55rem;
+  text-decoration: none;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+  position: relative;
+  animation: colorCycle 4s ease-in-out infinite;
+  cursor: pointer;
+  border-bottom: 1px solid transparent; /* prevent layout shift on hover */
+
+  &::after {
+    content: "|";
+    animation: blink 1s step-end infinite;
+    margin-left: 1px;
+    vertical-align: 0.05em;
+  }
+
+  &:hover {
+    animation: glitch 0.3s ease-in-out infinite;
+    text-decoration: none;
+    border-bottom-color: transparent;
+  }
+}
+
+.wildcard-link,
+.wildcard-link:hover {
+  text-decoration: none;
+  border-bottom: none;
+}
+
+@keyframes colorCycle {
+  0%,
+  100% {
+    color: #7a8c6e;
+  }
+  33% {
+    color: #c8441a;
+  }
+  66% {
+    color: #9e9a8e;
+  }
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes glitch {
+  0% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-2px, 1px);
+    filter: hue-rotate(90deg);
+  }
+  40% {
+    transform: translate(2px, -1px);
+    filter: hue-rotate(180deg);
+  }
+  60% {
+    transform: translate(-1px, 2px);
+    filter: hue-rotate(270deg);
+  }
+  80% {
+    transform: translate(1px, -2px);
+  }
+  100% {
+    transform: translate(0);
+    filter: none;
   }
 }
