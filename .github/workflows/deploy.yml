@@ -24,7 +24,8 @@ jobs:
           mkdir -p ~/.ssh
           echo "$SSH_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan ${{ secrets.DREAMHOST_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -v ${{ secrets.DREAMHOST_HOST }} >> ~/.ssh/known_hosts
+          ssh -i ~/.ssh/deploy_key -v ${{ secrets.DREAMHOST_USER }}@${{ secrets.DREAMHOST_HOST }} "echo connected"
           rsync -avz --delete dist/ \
             -e "ssh -i ~/.ssh/deploy_key" \
             ${{ secrets.DREAMHOST_USER }}@${{ secrets.DREAMHOST_HOST }}:${{ secrets.DREAMHOST_PATH }}/
