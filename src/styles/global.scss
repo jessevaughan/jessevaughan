@@ -84,7 +84,7 @@ main {
 
 .eyebrow {
   font-family: var(--mono);
-  font-size: clamp(0.6rem, 0.95vw, 0.9rem);
+  font-size: clamp(0.6rem, 0.95vw, 0.8rem);
   font-weight: 400;
   text-transform: uppercase;
   color: var(--muted);
@@ -131,7 +131,7 @@ h1 em {
   font-size: clamp(0.8rem, 1.5vw, 0.95rem);
   color: var(--muted);
   line-height: 1.6;
-  max-width: 38ch;
+  max-width: 44ch;
 }
 
 .status-line {
