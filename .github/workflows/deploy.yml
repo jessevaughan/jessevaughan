@@ -23,6 +23,6 @@ jobs:
           server: ${{ secrets.DREAMHOST_HOST }}
           username: ${{ secrets.DREAMHOST_USER }}
           password: ${{ secrets.DREAMHOST_PASSWORD }}
-          protocol: ftps
+          protocol: sftp
           local-dir: ./dist/
           server-dir: ${{ secrets.DREAMHOST_PATH }}/
