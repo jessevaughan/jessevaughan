@@ -1,0 +1,58 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="404 — Jesse Vaughan">
+  <main class="not-found">
+    <div class="identity">
+      <img class="avatar" src="/avatar.svg" alt="Jesse Vaughan" />
+      <p class="eyebrow">Jesse Vaughan</p>
+    </div>
+
+    <h1>4<em>0</em>4</h1>
+
+    <div class="descriptor">
+      <p>This page doesn't exist. Maybe it never did.</p>
+    </div>
+
+    <div class="status-line">
+      <div class="dot"></div>
+      <span>Lost in the desert.</span>
+    </div>
+
+    <a href="/" class="back-link">← Find your way back</a>
+  </main>
+
+  <footer>
+    <nav class="contact">
+      <a href="mailto:jesse.s.vaughan@gmail.com">Email</a>
+      <a href="https://www.linkedin.com/in/jessesvaughan/" target="_blank" rel="noopener">LinkedIn</a>
+      <!-- <a href="/wildcard" class="wildcard-link">WILDCARD</a> -->
+    </nav>
+    <span class="year">© 2026</span>
+  </footer>
+</Base>
+
+<style>
+  .not-found {
+    padding-top: 0;
+  }
+
+  .back-link {
+    display: inline;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 3px;
+    transition: text-decoration-color 0.2s ease, color 0.2s ease;
+    margin-top: 2.5rem;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+
+  .back-link:hover {
+    color: var(--accent);
+    text-decoration-color: var(--accent);
+  }
+</style>
+</Base>

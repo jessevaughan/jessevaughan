@@ -1,5 +1,6 @@
 ---
-// wildcard.astro — No layout, full standalone XP desktop
+// wildcard.astro — Windows XP desktop using XP.css
+// Customize: songs in TRACKS[], apps in the window HTML sections below
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -7,1087 +8,933 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Jesse Vaughan — Wildcard.exe</title>
+
+  <!-- XP.css — authentic Windows XP chrome -->
+  <link rel="stylesheet" href="https://unpkg.com/xp.css@0.2.3/dist/XP.css" />
+
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    /* ─── RESET & BASE ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; overflow: hidden; font-family: Tahoma, Arial, sans-serif; font-size: 11px; }
 
-    html, body {
-      width: 100%; height: 100%;
-      overflow: hidden;
-      font-family: Tahoma, Arial, sans-serif;
-      font-size: 11px;
-    }
-
-    /* ── DESKTOP ── */
+    /* ─── DESKTOP ─── */
     #desktop {
-      width: 100%;
-      height: calc(100% - 30px);
-      background: linear-gradient(180deg,
-        #7aaccc 0%, #a8cce0 25%,
-        #d4b88a 55%, #c4956a 72%,
-        #8c6030 88%, #6a4820 100%);
-      position: relative;
+      position: absolute; inset: 0 0 30px 0;
+      /* Joshua Tree desert gradient wallpaper */
+      background: linear-gradient(175deg,
+        #6a9fc0 0%, #9ac0d8 18%,
+        #c8a870 48%, #b87840 68%,
+        #7a5020 85%, #5a3810 100%);
       overflow: hidden;
     }
 
-    /* subtle grain on desktop */
-    #desktop::before {
-      content: '';
-      position: absolute; inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E");
-      pointer-events: none; z-index: 0;
-    }
-
-    /* ── DESKTOP ICONS ── */
-    .desktop-icons {
+    /* ─── DESKTOP ICONS ─── */
+    .icons {
       position: absolute; top: 12px; left: 12px;
-      display: flex; flex-direction: column; gap: 6px;
-      z-index: 1;
+      display: flex; flex-direction: column; gap: 4px;
     }
-
-    .desktop-icon {
-      display: flex; flex-direction: column; align-items: center;
-      width: 72px; padding: 4px; cursor: pointer;
-      border: 1px solid transparent; border-radius: 3px;
-      color: white;
-      text-shadow: 1px 1px 2px #000, -1px -1px 2px #000, 0 0 4px #000;
-      text-align: center;
+    .icon {
+      width: 72px; display: flex; flex-direction: column; align-items: center;
+      padding: 4px; border: 1px dotted transparent; border-radius: 2px;
+      cursor: pointer; color: white; text-align: center; gap: 3px;
+      text-shadow: 1px 1px 1px #000, 0 0 5px rgba(0,0,0,0.8);
     }
-    .desktop-icon:hover { background: rgba(49,106,197,0.4); border-color: rgba(255,255,255,0.5); }
-    .desktop-icon .icon-img { font-size: 30px; margin-bottom: 3px; line-height: 1; }
-    .desktop-icon .icon-label { font-size: 10px; line-height: 1.2; }
+    .icon:hover { background: rgba(49,106,197,0.4); border-color: rgba(255,255,255,0.6); }
+    .icon .ico { font-size: 28px; line-height: 1; }
+    .icon .lbl { font-size: 10px; line-height: 1.3; }
 
-    /* ── WINDOW ── */
-    .window {
-      position: absolute;
-      display: none;
-      flex-direction: column;
-      border: 2px solid #003cc4;
-      border-radius: 8px 8px 0 0;
-      box-shadow: 3px 3px 12px rgba(0,0,0,0.6);
-      overflow: hidden;
-      min-width: 180px;
+    /* ─── WINDOWS ─── */
+    .xp-win {
+      position: absolute; display: none;
+      /* XP.css handles all the chrome styling via .window class */
     }
-    .window.inactive { border-color: #7a96df; }
+    /* Override XP.css default width */
+    .xp-win .window { width: 100%; margin: 0; }
 
-    .window-titlebar {
-      background: linear-gradient(to bottom, #2b7fe5 0%, #1358d0 100%);
-      color: white; padding: 3px 5px;
-      display: flex; align-items: center;
-      cursor: move; user-select: none;
-      font-weight: bold; font-size: 11px;
-      height: 26px; flex-shrink: 0; gap: 4px;
-    }
-    .window.inactive .window-titlebar {
-      background: linear-gradient(to bottom, #7a96df, #6484c8);
-    }
-    .window-title-text { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-    .window-controls { display: flex; gap: 2px; flex-shrink: 0; }
-    .win-btn {
-      width: 21px; height: 18px; border: 1px solid rgba(255,255,255,0.4);
-      border-radius: 3px; font-size: 10px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      color: white; font-weight: bold; user-select: none;
-    }
-    .win-btn.minimize, .win-btn.maximize { background: linear-gradient(to bottom, #6ea8f0, #4080d8); }
-    .win-btn.close { background: linear-gradient(to bottom, #e05050, #c02020); }
-    .win-btn:hover.close { background: linear-gradient(to bottom, #ff6060, #e03030); }
-
-    .window-body { background: #ece9d8; flex: 1; overflow: auto; }
-
-    /* ── TASKBAR ── */
+    /* ─── TASKBAR ─── */
     #taskbar {
       position: fixed; bottom: 0; left: 0; right: 0; height: 30px;
-      background: linear-gradient(to bottom, #245edb, #1848c0);
-      display: flex; align-items: center; z-index: 10000;
-      padding: 0 2px; gap: 2px;
+      background: linear-gradient(to bottom, #3270e8 0%, #1e58d0 45%, #1848b8 50%, #1040a8 100%);
+      border-top: 2px solid #5898f8;
+      display: flex; align-items: center; z-index: 9000; gap: 2px; padding: 0 2px;
     }
-
     #start-btn {
-      background: linear-gradient(to bottom, #4caf50, #2e7d32);
-      color: white; border: 1px solid #1b5e20;
-      border-radius: 12px 0 0 12px;
-      padding: 3px 10px 3px 6px;
-      font-family: Tahoma, Arial, sans-serif;
-      font-size: 13px; font-weight: bold; cursor: pointer;
-      height: 24px; display: flex; align-items: center; gap: 4px;
-    }
-    #start-btn:hover { background: linear-gradient(to bottom, #66bb6a, #388e3c); }
-
-    #taskbar-apps { flex: 1; display: flex; align-items: center; gap: 2px; overflow: hidden; }
-
-    .taskbar-app {
-      height: 22px;
-      background: linear-gradient(to bottom, #3a78e8, #2456c0);
-      border: 1px solid rgba(255,255,255,0.25);
-      border-radius: 3px; color: white; font-size: 10px;
-      padding: 0 8px; cursor: pointer;
-      display: flex; align-items: center; gap: 4px;
-      white-space: nowrap; max-width: 140px; overflow: hidden;
-    }
-    .taskbar-app:hover { background: linear-gradient(to bottom, #4a88f8, #3466d0); }
-    .taskbar-app.focused {
-      background: linear-gradient(to bottom, #1a58c8, #0a3a90);
-      box-shadow: inset 1px 1px 3px rgba(0,0,0,0.4);
-    }
-
-    #systray {
-      background: linear-gradient(to bottom, #1a48b8, #0e32a0);
-      height: 100%; display: flex; align-items: center;
-      padding: 0 8px; border-left: 1px solid rgba(255,255,255,0.2);
-      color: white; font-size: 11px; gap: 6px;
-    }
-
-    /* ── START MENU ── */
-    #start-menu {
-      position: fixed; bottom: 30px; left: 0; width: 280px;
-      background: white; border: 1px solid #003cc4;
-      border-radius: 8px 8px 0 0;
-      box-shadow: 4px -4px 16px rgba(0,0,0,0.5);
-      z-index: 10001; display: none; overflow: hidden;
-    }
-    #start-menu.open { display: block; }
-
-    .start-menu-header {
-      background: linear-gradient(to right, #0858d8, #1a78f0);
-      color: white; padding: 10px 12px; font-size: 16px; font-weight: bold;
-      display: flex; align-items: center; gap: 10px;
-    }
-    .start-menu-avatar {
-      width: 40px; height: 40px; border-radius: 4px;
-      background: rgba(255,255,255,0.25);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 26px;
-    }
-    .start-menu-items { padding: 6px 0; }
-    .start-menu-item {
-      padding: 5px 14px; display: flex; align-items: center;
-      gap: 10px; cursor: pointer; font-size: 12px;
-    }
-    .start-menu-item:hover { background: #316ac5; color: white; }
-    .start-menu-item .item-icon { font-size: 18px; }
-    .start-menu-divider { height: 1px; background: #d4d0c8; margin: 4px 0; }
-    .start-menu-footer {
-      background: #d4d0c8; padding: 6px 12px;
-      display: flex; justify-content: flex-end;
-      border-top: 1px solid #b0aca0;
-    }
-    .start-menu-footer button {
-      background: none; border: none; cursor: pointer;
-      font-size: 11px; display: flex; align-items: center; gap: 4px;
-    }
-
-    /* ── ERROR POPUP ── */
-    .error-popup {
-      position: fixed; background: #ece9d8;
-      border: 2px solid #0058e0; border-radius: 8px 8px 0 0;
-      box-shadow: 4px 4px 12px rgba(0,0,0,0.6);
-      z-index: 9999; width: 300px; display: none;
-      font-family: Tahoma, Arial, sans-serif; font-size: 11px;
-    }
-    .error-popup.visible { display: block; }
-    .error-titlebar {
-      background: linear-gradient(to bottom, #c02020, #900000);
-      color: white; padding: 3px 6px;
-      display: flex; align-items: center;
-      font-weight: bold; font-size: 11px; height: 26px; gap: 4px;
-    }
-    .error-body { padding: 12px 16px; display: flex; gap: 12px; align-items: flex-start; }
-    .error-icon { font-size: 24px; flex-shrink: 0; }
-    .error-btn-row { padding: 6px 16px 10px; display: flex; justify-content: center; gap: 6px; }
-    .error-btn {
-      background: #ece9d8; border: 1px solid #888;
-      padding: 3px 14px; font-size: 11px; cursor: pointer; min-width: 56px;
-    }
-    .error-btn:hover { background: #dedad0; }
-
-    /* ══════════════════════════════
-       APP STYLES
-       ══════════════════════════════ */
-
-    /* WINAMP */
-    .winamp { background: #232323; color: #00ff00; font-family: 'Courier New', monospace; font-size: 10px; }
-    .winamp-display { background: #000; padding: 6px 8px; margin: 6px; border: 1px solid #333; }
-    .winamp-track { color: #00cc00; font-size: 10px; white-space: nowrap; overflow: hidden; margin-bottom: 4px; }
-    .winamp-time { color: #00ff00; font-size: 18px; letter-spacing: 3px; }
-    .winamp-viz { display: flex; gap: 2px; height: 22px; align-items: flex-end; margin-top: 4px; }
-    .winamp-viz-bar { width: 3px; background: #00ff00; animation: vizBar 0.12s ease-in-out infinite alternate; }
-    @keyframes vizBar { from { height: var(--h1, 4px); } to { height: var(--h2, 16px); } }
-    .winamp-controls { display: flex; align-items: center; padding: 4px 8px; gap: 3px; }
-    .winamp-btn {
-      background: #3a3a3a; border: 1px solid #555;
-      color: #ccc; font-size: 10px; padding: 2px 5px; cursor: pointer; border-radius: 2px;
-    }
-    .winamp-btn:hover { background: #4a4a4a; }
-    .winamp-volume { flex: 1; height: 4px; background: #444; margin-left: 6px; border-radius: 2px; }
-    .winamp-vol-fill { width: 75%; height: 100%; background: #00cc00; border-radius: 2px; }
-    .winamp-playlist { border-top: 1px solid #333; padding: 4px 8px; max-height: 110px; overflow-y: auto; }
-    .winamp-playlist-item { padding: 2px 0; color: #666; cursor: pointer; display: flex; gap: 6px; }
-    .winamp-playlist-item.active { color: #00ff00; }
-    .winamp-playlist-item:hover { color: #aaa; }
-    .winamp-track-num { color: #444; min-width: 18px; }
-
-    /* MTG */
-    .mtg-viewer {
-      background: #120800; color: #c8a060;
-      font-family: 'Times New Roman', serif;
-      padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 8px;
-    }
-    .mtg-title { font-size: 13px; font-weight: bold; color: #d4a860; text-align: center; text-shadow: 0 0 8px rgba(200,160,80,0.5); }
-    .mtg-set-selector { display: flex; gap: 6px; }
-    .mtg-set-btn {
-      background: #200d00; border: 1px solid #7a5020;
-      color: #c8a060; padding: 3px 8px; font-size: 10px; cursor: pointer; border-radius: 3px;
-    }
-    .mtg-set-btn:hover, .mtg-set-btn.active { background: #3a1a00; border-color: #c8a060; color: #f0c878; }
-    .mtg-card-display {
-      width: 180px; height: 252px;
-      border: 2px solid #7a5020; border-radius: 8px;
-      overflow: hidden; display: flex; align-items: center; justify-content: center;
-      background: #0a0400;
-    }
-    .mtg-card-display img { width: 100%; height: 100%; object-fit: cover; }
-    .mtg-card-loading { color: #7a5020; font-size: 12px; text-align: center; padding: 10px; }
-    .mtg-draw-btn {
-      background: linear-gradient(to bottom, #3a1e00, #200e00);
-      border: 2px solid #c8a060; color: #f0c878;
-      padding: 6px 16px; font-size: 12px; cursor: pointer;
-      border-radius: 4px; font-family: 'Times New Roman', serif; font-weight: bold;
-    }
-    .mtg-draw-btn:hover { background: linear-gradient(to bottom, #5a2e00, #3a1800); }
-
-    /* MINESWEEPER */
-    .minesweeper { background: #c0c0c0; padding: 8px; user-select: none; }
-    .ms-header {
-      background: #c0c0c0; border: 3px solid;
-      border-color: #fff #808080 #808080 #fff;
-      padding: 4px 6px; display: flex; justify-content: space-between;
-      align-items: center; margin-bottom: 6px;
-    }
-    .ms-counter {
-      background: #000; color: #ff0000;
-      font-family: 'Courier New', monospace; font-size: 20px;
-      padding: 2px 4px; letter-spacing: 2px; min-width: 46px; text-align: right;
-    }
-    .ms-face-btn {
-      width: 28px; height: 28px; background: #c0c0c0; border: 3px solid;
-      border-color: #fff #808080 #808080 #fff;
-      cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center;
-    }
-    .ms-face-btn:active { border-color: #808080 #fff #fff #808080; }
-    .ms-grid { display: inline-grid; border: 3px solid; border-color: #808080 #fff #fff #808080; }
-    .ms-cell {
-      width: 22px; height: 22px; background: #c0c0c0; border: 2px solid;
-      border-color: #fff #808080 #808080 #fff;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: bold; cursor: pointer;
-    }
-    .ms-cell.revealed { border: 1px solid #808080; }
-    .ms-cell.mine { background: #ff0000; }
-    .ms-num-1 { color: #0000ff; }
-    .ms-num-2 { color: #008000; }
-    .ms-num-3 { color: #ff0000; }
-    .ms-num-4 { color: #000080; }
-    .ms-num-5 { color: #800000; }
-    .ms-num-6 { color: #008080; }
-    .ms-num-7 { color: #000000; }
-    .ms-num-8 { color: #808080; }
-
-    /* AIM */
-    .aim-app { background: #fff; font-family: Arial, sans-serif; font-size: 11px; }
-    .aim-header {
-      background: linear-gradient(to bottom, #4488dd, #2266bb);
-      padding: 6px 8px; display: flex; align-items: center; gap: 8px;
-    }
-    .aim-logo { font-size: 18px; }
-    .aim-header-text { color: white; font-weight: bold; font-size: 12px; }
-    .aim-online-bar { background: #e8f0ff; padding: 5px 8px; border-bottom: 1px solid #c0d0e8; }
-    .aim-screen-name { font-weight: bold; color: #2244aa; font-size: 13px; }
-    .aim-online-sub { color: #666; font-size: 9px; }
-    .aim-away-msg {
-      background: #ffffd0; border: 1px solid #d0d090;
-      margin: 6px; padding: 6px 8px; font-size: 11px; font-style: italic; color: #444;
-    }
-    .aim-away-label { font-size: 9px; color: #888; font-style: normal; font-weight: bold; margin-bottom: 3px; }
-    .aim-group-header {
-      background: #d0d8f0; padding: 3px 8px;
-      font-weight: bold; font-size: 10px; color: #2244aa;
-      cursor: pointer; display: flex; justify-content: space-between;
-    }
-    .aim-buddy { padding: 3px 16px; display: flex; align-items: center; gap: 6px; cursor: pointer; }
-    .aim-buddy:hover { background: #e8f0ff; }
-    .aim-buddy-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .aim-buddy-dot.online { background: #00aa00; }
-    .aim-buddy-dot.away { background: #ffaa00; }
-    .aim-buddy-dot.offline { background: #aaa; }
-
-    /* DIABLO II */
-    .diablo-app { background: #080400; color: #c8a060; font-family: 'Times New Roman', serif; padding: 10px; }
-    .diablo-title {
-      color: #cc2200; font-size: 18px; font-weight: bold;
-      text-align: center; text-shadow: 0 0 12px rgba(200,34,0,0.9);
-      margin-bottom: 2px; letter-spacing: 4px;
-    }
-    .diablo-subtitle { color: #666650; font-size: 9px; text-align: center; margin-bottom: 12px; letter-spacing: 3px; }
-    .diablo-char { display: flex; gap: 10px; }
-    .diablo-portrait {
-      width: 80px; height: 100px; background: #100600;
-      border: 2px solid #4a2800;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 50px; flex-shrink: 0;
-    }
-    .diablo-info { flex: 1; }
-    .diablo-name { color: #e8d090; font-size: 15px; font-weight: bold; margin-bottom: 1px; }
-    .diablo-class { color: #7a6040; font-size: 9px; margin-bottom: 8px; letter-spacing: 2px; }
-    .diablo-stat {
-      display: flex; justify-content: space-between;
-      padding: 2px 0; font-size: 11px; border-bottom: 1px solid #201000;
-    }
-    .diablo-stat-label { color: #9a7850; }
-    .diablo-stat-value { color: #e8c080; font-weight: bold; }
-    .diablo-skills { margin-top: 10px; }
-    .diablo-skills-title { color: #cc2200; font-size: 10px; margin-bottom: 6px; letter-spacing: 2px; text-shadow: 0 0 6px rgba(200,34,0,0.6); }
-    .diablo-skill { display: flex; align-items: center; gap: 6px; padding: 2px 0; font-size: 10px; }
-    .diablo-skill-name { color: #b09060; flex: 1; }
-    .diablo-skill-bar { width: 80px; height: 8px; background: #150800; border: 1px solid #4a2000; border-radius: 2px; overflow: hidden; }
-    .diablo-skill-fill { height: 100%; background: linear-gradient(to right, #aa1a00, #ff4400); }
-    .diablo-skill-level { color: #c8a060; min-width: 18px; text-align: right; }
-
-    /* FRUITYLOOPS */
-    .fl-app { background: #252525; color: #ccc; font-family: Arial, sans-serif; font-size: 10px; padding: 8px; }
-    .fl-toolbar {
+      height: 24px; padding: 0 12px 0 8px;
+      background: linear-gradient(to bottom, #68c868, #40a840 35%, #308830 65%, #287028);
+      border: 1px solid #1a5018; border-radius: 0 14px 14px 0;
+      color: white; font-size: 13px; font-weight: bold; cursor: pointer;
       display: flex; align-items: center; gap: 5px;
-      margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #3a3a3a;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5); font-family: Tahoma, sans-serif;
+      box-shadow: 0 1px 0 rgba(255,255,255,0.4) inset;
     }
-    .fl-toolbar-btn {
-      background: #383838; border: 1px solid #555; color: #ccc;
-      padding: 3px 8px; font-size: 10px; cursor: pointer; border-radius: 2px;
+    #start-btn:hover { filter: brightness(1.1); }
+    #start-btn:active { filter: brightness(0.85); }
+    #tb-apps { flex: 1; display: flex; align-items: center; gap: 2px; overflow: hidden; padding: 0 4px; }
+    .tb-btn {
+      height: 22px; padding: 0 8px; max-width: 140px; overflow: hidden;
+      background: linear-gradient(to bottom, #3a78e8, #1e50c0);
+      border: 1px solid rgba(255,255,255,0.2); border-radius: 3px;
+      color: white; font-size: 10px; cursor: pointer;
+      display: flex; align-items: center; gap: 4px; white-space: nowrap;
     }
-    .fl-toolbar-btn:hover { background: #454545; }
-    .fl-toolbar-btn.playing { background: #1a5a1a; color: #00ff00; border-color: #00aa00; }
-    .fl-bpm { color: #777; font-size: 10px; }
-    .fl-bpm-value { color: #00cc00; font-weight: bold; }
-    .fl-step-header { display: grid; grid-template-columns: 64px repeat(16, 1fr); gap: 1px; margin-bottom: 2px; }
-    .fl-step-num { text-align: center; color: #555; font-size: 8px; padding: 1px 0; }
-    .fl-step-num.beat { color: #777; font-weight: bold; }
-    .fl-track { display: grid; grid-template-columns: 64px repeat(16, 1fr); gap: 1px; margin-bottom: 2px; }
-    .fl-track-name {
-      background: #1a1a1a; border: 1px solid #3a3a3a;
-      padding: 3px 5px; font-size: 9px; color: #aaa;
-      display: flex; align-items: center; border-radius: 2px;
+    .tb-btn:hover { filter: brightness(1.15); }
+    .tb-btn.active { background: linear-gradient(to bottom, #1040a0, #083080); box-shadow: 1px 1px 4px rgba(0,0,0,0.5) inset; }
+    #systray {
+      height: 100%; padding: 0 10px; display: flex; align-items: center; gap: 8px;
+      border-left: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.15);
+      color: white; font-size: 11px; white-space: nowrap;
     }
-    .fl-pad {
-      height: 20px; background: #1a1a1a; border: 1px solid #2a2a2a;
-      cursor: pointer; border-radius: 2px;
+
+    /* ─── START MENU ─── */
+    #smenu {
+      position: fixed; bottom: 30px; left: 0; width: 290px;
+      background: white; display: none;
+      border: 1px solid #0040c0; border-radius: 8px 8px 0 0;
+      box-shadow: 4px -4px 20px rgba(0,0,0,0.5); z-index: 9001; overflow: hidden;
     }
-    .fl-pad:hover { background: #282828; }
-    .fl-pad.active.kick    { background: #6a2000; border-color: #ff5500; box-shadow: 0 0 4px rgba(255,85,0,0.4); }
-    .fl-pad.active.snare   { background: #6a5800; border-color: #ffcc00; box-shadow: 0 0 4px rgba(255,200,0,0.4); }
-    .fl-pad.active.hihat   { background: #103870; border-color: #3388ff; box-shadow: 0 0 4px rgba(51,136,255,0.4); }
-    .fl-pad.active.bass    { background: #3a1060; border-color: #aa44ff; box-shadow: 0 0 4px rgba(170,68,255,0.4); }
-    .fl-pad.current { filter: brightness(1.6); }
+    #smenu.open { display: block; }
+    .sm-head { background: linear-gradient(to right, #0848d8, #1878ff); padding: 10px 14px; display: flex; align-items: center; gap: 12px; }
+    .sm-av { width: 42px; height: 42px; border-radius: 4px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 28px; border: 2px solid rgba(255,255,255,0.4); }
+    .sm-name { font-size: 16px; font-weight: bold; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.4); }
+    .sm-body { padding: 6px 0; border-bottom: 2px solid #d0ccc0; }
+    .sm-item { padding: 6px 14px; display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 12px; }
+    .sm-item:hover { background: #316ac5; color: white; }
+    .sm-icon { font-size: 18px; }
+    .sm-div { height: 1px; background: #d0ccc0; margin: 4px 14px; }
+    .sm-foot { background: #d4d0c8; padding: 6px 14px; display: flex; justify-content: flex-end; border-top: 1px solid #b8b4ac; }
+    .sm-foot button { background: none; border: none; cursor: pointer; font-size: 11px; }
+
+    /* ─── ERROR POPUP ─── */
+    #err-popup { position: fixed; display: none; z-index: 20000; width: 340px; }
+    #err-popup.show { display: block; }
+
+    /* ─── WINAMP APP ─── */
+    .wa-wrap { background: #232323; }
+    .wa-display { background: #000; margin: 5px; border: 1px solid #2a2a2a; padding: 6px 8px; }
+    .wa-track { color: #00cc00; font-family: monospace; font-size: 9px; white-space: nowrap; overflow: hidden; margin-bottom: 3px; }
+    .wa-row { display: flex; justify-content: space-between; align-items: flex-end; }
+    .wa-time { color: #00ff00; font-family: monospace; font-size: 20px; letter-spacing: 3px; font-weight: bold; }
+    .wa-viz { display: flex; gap: 1px; height: 22px; align-items: flex-end; }
+    .wa-bar { width: 3px; background: #00ee00; border-radius: 1px 1px 0 0; animation: vzbar 0.1s ease-in-out infinite alternate; }
+    @keyframes vzbar { from { height: var(--lo); } to { height: var(--hi); } }
+    .wa-ctrl { display: flex; align-items: center; padding: 4px 6px; gap: 3px; background: #1c1c1c; }
+    .wa-ctrl button { background: #383838; border: 1px solid #555; color: #ccc; font-size: 10px; padding: 2px 6px; cursor: pointer; border-radius: 2px; font-family: monospace; }
+    .wa-ctrl button:hover { background: #484848; }
+    .wa-ctrl button:active { background: #111; }
+    .wa-vol { flex: 1; height: 4px; background: #333; margin-left: 6px; border-radius: 2px; overflow: hidden; }
+    .wa-vf { width: 75%; height: 100%; background: linear-gradient(to right, #00aa00, #00ff00); }
+    .wa-list { border-top: 1px solid #2a2a2a; background: #0c0c0c; max-height: 130px; overflow-y: auto; }
+    .wa-li { padding: 3px 8px; color: #666; cursor: pointer; display: flex; gap: 6px; font-family: monospace; font-size: 10px; }
+    .wa-li.now { color: #00ff00; background: #001800; }
+    .wa-li:hover { background: #181818; color: #aaa; }
+    .wa-li.now:hover { background: #002000; }
+    .wa-num { color: #444; min-width: 18px; }
+
+    /* ─── MTG APP ─── */
+    .mtg-body { background: #0e0600; padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 8px; font-family: 'Times New Roman', serif; }
+    .mtg-title { font-size: 13px; font-weight: bold; color: #d4a050; text-shadow: 0 0 10px rgba(212,160,80,0.6); }
+    .mtg-sets { display: flex; gap: 5px; }
+    .mtg-set-btn { background: #1a0a00; border: 1px solid #6a4010; color: #b09050; padding: 3px 8px; font-size: 10px; cursor: pointer; border-radius: 3px; font-family: Tahoma, sans-serif; }
+    .mtg-set-btn:hover { background: #2e1400; }
+    .mtg-set-btn.active { background: #2e1400; border-color: #c8a050; color: #e8c068; }
+    .mtg-card { width: 182px; height: 254px; border: 2px solid #6a4010; border-radius: 10px; overflow: hidden; background: #080300; display: flex; align-items: center; justify-content: center; }
+    .mtg-card img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+    .mtg-loading { color: #6a4010; font-size: 11px; text-align: center; padding: 10px; font-family: Tahoma, sans-serif; }
+    .mtg-draw { background: linear-gradient(to bottom, #3a1e00, #1e0800); border: 2px solid #c8a050; color: #e8c068; padding: 7px 18px; font-size: 12px; cursor: pointer; border-radius: 4px; font-family: 'Times New Roman', serif; font-weight: bold; }
+    .mtg-draw:hover { background: linear-gradient(to bottom, #5a2e00, #2e1000); }
+    .mtg-draw:active { filter: brightness(0.85); }
+    .mtg-name { color: #c8a050; font-size: 10px; text-align: center; font-family: Tahoma, sans-serif; min-height: 14px; }
+
+    /* ─── MINESWEEPER ─── */
+    /* XP.css styles buttons/inputs; we handle the grid */
+    .ms-body { background: #c0c0c0; padding: 8px; user-select: none; }
+    .ms-head { background: #c0c0c0; border: 3px solid; border-color: #fff #808080 #808080 #fff; padding: 4px 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .ms-count { background: #000; color: #f00; font-family: monospace; font-size: 20px; padding: 1px 4px; min-width: 46px; text-align: right; letter-spacing: 2px; }
+    .ms-face { width: 28px; height: 28px; background: #c0c0c0; border: 3px solid; border-color: #fff #808080 #808080 #fff; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+    .ms-face:active { border-color: #808080 #fff #fff #808080; }
+    .ms-grid { border: 3px solid; border-color: #808080 #fff #fff #808080; display: inline-grid; }
+    .ms-cell { width: 22px; height: 22px; background: #c0c0c0; border: 2px solid; border-color: #fff #808080 #808080 #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; cursor: pointer; }
+    .ms-cell.open { border: 1px solid #808080; cursor: default; }
+    .ms-cell.dead { background: #f00; }
+    .n1{color:#00f}.n2{color:#080}.n3{color:#f00}.n4{color:#000080}.n5{color:#800000}.n6{color:#008080}.n7{color:#000}.n8{color:#808080}
+
+    /* ─── AIM ─── */
+    .aim-head { background: linear-gradient(to bottom, #5599ee, #2266cc); padding: 6px 8px; display: flex; align-items: center; gap: 8px; }
+    .aim-logo { font-size: 22px; }
+    .aim-headtxt { color: #fff; font-weight: bold; font-size: 12px; }
+    .aim-bar { background: #e0ecff; padding: 5px 8px; border-bottom: 1px solid #c0d4f0; }
+    .aim-sn { font-weight: bold; color: #1144aa; font-size: 13px; }
+    .aim-status { color: #666; font-size: 9px; }
+    .aim-away { background: #ffffe0; border: 1px solid #c8c860; margin: 6px; padding: 6px 8px; font-size: 11px; color: #444; font-style: italic; }
+    .aim-away-lbl { font-size: 9px; font-weight: bold; font-style: normal; color: #888; margin-bottom: 2px; }
+    .aim-group-hdr { background: #c8d8f0; padding: 3px 8px; font-weight: bold; color: #1144aa; font-size: 10px; display: flex; justify-content: space-between; }
+    .aim-buddy { padding: 3px 16px; display: flex; align-items: center; gap: 7px; cursor: pointer; font-size: 11px; }
+    .aim-buddy:hover { background: #e8f0ff; }
+    .aim-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .dot-on { background: #00aa00; }
+    .dot-aw { background: #ffaa00; }
+    .dot-off { background: #aaa; }
+
+    /* ─── DIABLO II ─── */
+    .d2-body { background: #080300; color: #c8a050; font-family: 'Times New Roman', serif; padding: 10px; }
+    .d2-logo { color: #cc2000; font-size: 20px; font-weight: bold; text-align: center; text-shadow: 0 0 15px rgba(200,32,0,0.9); letter-spacing: 4px; }
+    .d2-sub { color: #555040; font-size: 9px; text-align: center; letter-spacing: 3px; margin-bottom: 10px; }
+    .d2-char { display: flex; gap: 10px; }
+    .d2-portrait { width: 80px; height: 110px; background: #100600; border: 2px solid #3a1800; display: flex; align-items: center; justify-content: center; font-size: 52px; flex-shrink: 0; }
+    .d2-info { flex: 1; }
+    .d2-name { color: #e8d080; font-size: 15px; font-weight: bold; }
+    .d2-class { color: #6a5030; font-size: 9px; letter-spacing: 2px; margin-bottom: 7px; }
+    .d2-stat { display: flex; justify-content: space-between; padding: 2px 0; border-bottom: 1px solid #180c00; font-size: 11px; }
+    .d2-stat-l { color: #907050; }
+    .d2-stat-v { color: #e8c070; font-weight: bold; }
+    .d2-skills-hdr { color: #cc2000; font-size: 10px; letter-spacing: 2px; margin: 8px 0 4px; text-shadow: 0 0 6px rgba(200,32,0,0.5); }
+    .d2-skill { display: flex; align-items: center; gap: 6px; padding: 2px 0; font-size: 10px; }
+    .d2-skill-name { color: #b09060; flex: 1; }
+    .d2-bar { width: 80px; height: 8px; background: #130800; border: 1px solid #3a1800; border-radius: 2px; overflow: hidden; }
+    .d2-fill { height: 100%; background: linear-gradient(to right, #aa1800, #ff4000); }
+    .d2-lvl { color: #c8a050; min-width: 20px; text-align: right; }
+
+    /* ─── FRUITYLOOPS ─── */
+    .fl-body { background: #222; color: #ccc; font-size: 10px; padding: 8px; }
+    .fl-toolbar { display: flex; align-items: center; gap: 5px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #333; flex-wrap: wrap; }
+    .fl-btn { background: linear-gradient(to bottom, #404040, #282828); border: 1px solid #555; color: #ccc; padding: 3px 8px; font-size: 10px; cursor: pointer; border-radius: 2px; font-family: Tahoma, sans-serif; }
+    .fl-btn:hover { background: linear-gradient(to bottom, #505050, #383838); }
+    .fl-btn:active { background: #111; }
+    .fl-btn.playing { background: linear-gradient(to bottom, #185018, #0c3a0c); color: #0f0; border-color: #0a0; }
+    .fl-bpm-label { color: #666; }
+    .fl-bpm-val { color: #0c0; font-weight: bold; }
+    .fl-nums { display: grid; grid-template-columns: 64px repeat(16, 1fr); gap: 1px; margin-bottom: 2px; }
+    .fl-num { text-align: center; color: #444; font-size: 8px; }
+    .fl-num.beat { color: #666; font-weight: bold; }
+    .fl-row { display: grid; grid-template-columns: 64px repeat(16, 1fr); gap: 1px; margin-bottom: 2px; }
+    .fl-label { background: #181818; border: 1px solid #333; padding: 3px 5px; font-size: 9px; color: #aaa; display: flex; align-items: center; border-radius: 2px; }
+    .fl-pad { height: 20px; background: #161616; border: 1px solid #252525; cursor: pointer; border-radius: 2px; }
+    .fl-pad:hover { background: #252525; }
+    .fl-pad.on.kick  { background: #602000; border-color: #f05000; box-shadow: 0 0 4px rgba(240,80,0,0.4); }
+    .fl-pad.on.snare { background: #585000; border-color: #f0c000; box-shadow: 0 0 4px rgba(240,192,0,0.4); }
+    .fl-pad.on.hihat { background: #102860; border-color: #2878f0; box-shadow: 0 0 4px rgba(40,120,240,0.4); }
+    .fl-pad.on.bass  { background: #300a58; border-color: #9830f0; box-shadow: 0 0 4px rgba(152,48,240,0.4); }
+    .fl-pad.step { filter: brightness(2.2); }
   </style>
 </head>
 <body>
 
-<!-- Desktop -->
+<!-- ═══════════════════════════ DESKTOP ═══════════════════════════ -->
 <div id="desktop">
-  <div class="desktop-icons">
-    <div class="desktop-icon" ondblclick="openWindow('winamp')">
-      <div class="icon-img">🎵</div>
-      <div class="icon-label">Winamp 2.95</div>
-    </div>
-    <div class="desktop-icon" ondblclick="openWindow('mtg')">
-      <div class="icon-img">🃏</div>
-      <div class="icon-label">MTG Collection</div>
-    </div>
-    <div class="desktop-icon" ondblclick="openWindow('minesweeper')">
-      <div class="icon-img">💣</div>
-      <div class="icon-label">Minesweeper</div>
-    </div>
-    <div class="desktop-icon" ondblclick="openWindow('aim')">
-      <div class="icon-img">💬</div>
-      <div class="icon-label">AIM 5.9</div>
-    </div>
-    <div class="desktop-icon" ondblclick="openWindow('diablo')">
-      <div class="icon-img">⚔️</div>
-      <div class="icon-label">Diablo II</div>
-    </div>
-    <div class="desktop-icon" ondblclick="openWindow('fl')">
-      <div class="icon-img">🎹</div>
-      <div class="icon-label">FruityLoops 3.4</div>
-    </div>
-    <div class="desktop-icon" ondblclick="window.location.href='/'">
-      <div class="icon-img">🌐</div>
-      <div class="icon-label">jessevaughan.com</div>
-    </div>
+  <div class="icons">
+    <div class="icon" ondblclick="openApp('wa')">    <div class="ico">🎵</div><div class="lbl">Winamp 2.95</div></div>
+    <div class="icon" ondblclick="openApp('mtg')">   <div class="ico">🃏</div><div class="lbl">MTG Collection</div></div>
+    <div class="icon" ondblclick="openApp('ms')">    <div class="ico">💣</div><div class="lbl">Minesweeper</div></div>
+    <div class="icon" ondblclick="openApp('aim')">   <div class="ico">💬</div><div class="lbl">AIM 5.9</div></div>
+    <div class="icon" ondblclick="openApp('d2')">    <div class="ico">⚔️</div><div class="lbl">Diablo II</div></div>
+    <div class="icon" ondblclick="openApp('fl')">    <div class="ico">🎹</div><div class="lbl">FruityLoops 3.4</div></div>
+    <div class="icon" ondblclick="location.href='/'"><div class="ico">🌐</div><div class="lbl">jessevaughan.com</div></div>
   </div>
 </div>
 
-<!-- ══ WINDOWS ══ -->
 
-<!-- WINAMP -->
-<div class="window" id="win-winamp" style="top:80px;left:60px;width:300px;">
-  <div class="window-titlebar" onmousedown="startDrag(event,'win-winamp')">
-    <span>🎵</span><span class="window-title-text">Winamp 2.95</span>
-    <div class="window-controls">
-      <div class="win-btn minimize" onclick="minimizeWindow('win-winamp')">_</div>
-      <div class="win-btn maximize">□</div>
-      <div class="win-btn close" onclick="closeWindow('win-winamp')">✕</div>
-    </div>
-  </div>
-  <div class="window-body winamp">
-    <div class="winamp-display">
-      <div class="winamp-track" id="winamp-track">▶ Boards of Canada - Aquarius</div>
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <div class="winamp-time" id="winamp-time">2:14</div>
-        <div class="winamp-viz" id="winamp-viz"></div>
+<!-- ═══════════════════════════ APP WINDOWS ═══════════════════════════
+     Each window: .xp-win wrapper (handles position/show/hide)
+                  .window (XP.css class — handles all chrome styling)
+     ═══════════════════════════════════════════════════════════════ -->
+
+<!-- ── WINAMP ── -->
+<div class="xp-win" id="app-wa" style="top:60px; left:60px; width:310px;">
+  <div class="window">
+    <div class="title-bar" onmousedown="dragStart(event,'app-wa')">
+      <div class="title-bar-text">🎵 Winamp 2.95</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeApp('app-wa')"></button>
+        <button aria-label="Maximize"></button>
+        <button aria-label="Close" onclick="closeApp('app-wa')"></button>
       </div>
     </div>
-    <div class="winamp-controls">
-      <button class="winamp-btn" onclick="winampPrev()">⏮</button>
-      <button class="winamp-btn" id="winamp-play-btn" onclick="winampPlayPause()">⏸</button>
-      <button class="winamp-btn" onclick="winampNext()">⏭</button>
-      <button class="winamp-btn">⏹</button>
-      <div class="winamp-volume"><div class="winamp-vol-fill"></div></div>
-    </div>
-    <div class="winamp-playlist">
-      <div class="winamp-playlist-item active" data-idx="0"><span class="winamp-track-num">01</span>Boards of Canada - Aquarius</div>
-      <div class="winamp-playlist-item" data-idx="1"><span class="winamp-track-num">02</span>Daft Punk - Digital Love</div>
-      <div class="winamp-playlist-item" data-idx="2"><span class="winamp-track-num">03</span>Aphex Twin - Xtal</div>
-      <div class="winamp-playlist-item" data-idx="3"><span class="winamp-track-num">04</span>Portishead - Sour Times</div>
-      <div class="winamp-playlist-item" data-idx="4"><span class="winamp-track-num">05</span>Massive Attack - Teardrop</div>
-      <div class="winamp-playlist-item" data-idx="5"><span class="winamp-track-num">06</span>Chemical Brothers - Block Rockin Beats</div>
-      <div class="winamp-playlist-item" data-idx="6"><span class="winamp-track-num">07</span>Prodigy - Firestarter</div>
-    </div>
-  </div>
-</div>
-
-<!-- MTG -->
-<div class="window" id="win-mtg" style="top:60px;left:580px;width:220px;">
-  <div class="window-titlebar" onmousedown="startDrag(event,'win-mtg')" style="background:linear-gradient(to bottom,#600800,#300400);">
-    <span>🃏</span><span class="window-title-text">MTG Collection</span>
-    <div class="window-controls">
-      <div class="win-btn minimize" onclick="minimizeWindow('win-mtg')">_</div>
-      <div class="win-btn maximize">□</div>
-      <div class="win-btn close" onclick="closeWindow('win-mtg')">✕</div>
-    </div>
-  </div>
-  <div class="window-body mtg-viewer">
-    <div class="mtg-title">⚔ The Gathering ⚔</div>
-    <div class="mtg-set-selector">
-      <button class="mtg-set-btn active" data-set="ice" onclick="setMtgSet('ice',this)">Ice Age</button>
-      <button class="mtg-set-btn" data-set="5ed" onclick="setMtgSet('5ed',this)">5th Ed.</button>
-      <button class="mtg-set-btn" data-set="all" onclick="setMtgSet('all',this)">Alliances</button>
-    </div>
-    <div class="mtg-card-display" id="mtg-card-display">
-      <div class="mtg-card-loading">Shuffling library...</div>
-    </div>
-    <button class="mtg-draw-btn" onclick="drawMtgCard()">✦ Draw Card ✦</button>
-  </div>
-</div>
-
-<!-- MINESWEEPER -->
-<div class="window" id="win-minesweeper" style="top:200px;left:380px;width:auto;">
-  <div class="window-titlebar" onmousedown="startDrag(event,'win-minesweeper')">
-    <span>💣</span><span class="window-title-text">Minesweeper</span>
-    <div class="window-controls">
-      <div class="win-btn minimize" onclick="minimizeWindow('win-minesweeper')">_</div>
-      <div class="win-btn maximize">□</div>
-      <div class="win-btn close" onclick="closeWindow('win-minesweeper')">✕</div>
-    </div>
-  </div>
-  <div class="window-body minesweeper" id="ms-container"></div>
-</div>
-
-<!-- AIM -->
-<div class="window" id="win-aim" style="top:80px;left:820px;width:200px;">
-  <div class="window-titlebar" onmousedown="startDrag(event,'win-aim')">
-    <span>💬</span><span class="window-title-text">AIM 5.9</span>
-    <div class="window-controls">
-      <div class="win-btn minimize" onclick="minimizeWindow('win-aim')">_</div>
-      <div class="win-btn maximize">□</div>
-      <div class="win-btn close" onclick="closeWindow('win-aim')">✕</div>
-    </div>
-  </div>
-  <div class="window-body aim-app">
-    <div class="aim-header">
-      <span class="aim-logo">🔵</span>
-      <span class="aim-header-text">AOL Instant Messenger</span>
-    </div>
-    <div class="aim-online-bar">
-      <div class="aim-screen-name">DesignNerd87</div>
-      <div class="aim-online-sub">Online — <span id="aim-timer">0:00:00</span></div>
-    </div>
-    <div class="aim-away-msg">
-      <div class="aim-away-label">AWAY MESSAGE:</div>
-      brb, making beats in the garage. might also be playing d2. probably both.
-    </div>
-    <div class="aim-group-header"><span>Buddies (4/6)</span><span>▼</span></div>
-    <div class="aim-buddy"><div class="aim-buddy-dot online"></div>xXShadowmage99Xx</div>
-    <div class="aim-buddy"><div class="aim-buddy-dot online"></div>KazaaQueen2002</div>
-    <div class="aim-buddy"><div class="aim-buddy-dot away"></div>ProducerMike_FL</div>
-    <div class="aim-buddy"><div class="aim-buddy-dot online"></div>MTGTrader_Zach</div>
-    <div class="aim-buddy"><div class="aim-buddy-dot offline"></div>DiabloLAN_Steve</div>
-    <div class="aim-buddy"><div class="aim-buddy-dot offline"></div>FinePix_Fanatic</div>
-  </div>
-</div>
-
-<!-- DIABLO II -->
-<div class="window" id="win-diablo" style="top:220px;left:80px;width:270px;">
-  <div class="window-titlebar" onmousedown="startDrag(event,'win-diablo')" style="background:linear-gradient(to bottom,#5a0000,#2a0000);">
-    <span>⚔️</span><span class="window-title-text">Diablo II: Lord of Destruction</span>
-    <div class="window-controls">
-      <div class="win-btn minimize" onclick="minimizeWindow('win-diablo')">_</div>
-      <div class="win-btn maximize">□</div>
-      <div class="win-btn close" onclick="closeWindow('win-diablo')">✕</div>
-    </div>
-  </div>
-  <div class="window-body diablo-app">
-    <div class="diablo-title">DIABLO II</div>
-    <div class="diablo-subtitle">LORD OF DESTRUCTION</div>
-    <div class="diablo-char">
-      <div class="diablo-portrait">💀</div>
-      <div class="diablo-info">
-        <div class="diablo-name">Jesse</div>
-        <div class="diablo-class">NECROMANCER · LVL 87</div>
-        <div class="diablo-stat"><span class="diablo-stat-label">Strength</span><span class="diablo-stat-value">75</span></div>
-        <div class="diablo-stat"><span class="diablo-stat-label">Dexterity</span><span class="diablo-stat-value">68</span></div>
-        <div class="diablo-stat"><span class="diablo-stat-label">Vitality</span><span class="diablo-stat-value">300</span></div>
-        <div class="diablo-stat"><span class="diablo-stat-label">Energy</span><span class="diablo-stat-value">142</span></div>
-        <div class="diablo-stat"><span class="diablo-stat-label">Gold</span><span class="diablo-stat-value">2,847,391</span></div>
+    <div class="window-body" style="padding:0">
+      <div class="wa-wrap">
+        <div class="wa-display">
+          <div class="wa-track" id="wa-track">▶ Boards of Canada - Aquarius</div>
+          <div class="wa-row">
+            <div class="wa-time" id="wa-time">2:14</div>
+            <div class="wa-viz" id="wa-viz"></div>
+          </div>
+        </div>
+        <div class="wa-ctrl">
+          <button onclick="waPrev()">|◀</button>
+          <button id="wa-pb" onclick="waToggle()">▐▐</button>
+          <button onclick="waNext()">▶|</button>
+          <button>■</button>
+          <div class="wa-vol"><div class="wa-vf"></div></div>
+        </div>
+        <div class="wa-list" id="wa-list">
+          <!-- Playlist items injected by JS — edit TRACKS array below -->
+        </div>
       </div>
     </div>
-    <div class="diablo-skills">
-      <div class="diablo-skills-title">SKILL TREE</div>
-      <div class="diablo-skill"><span class="diablo-skill-name">Brand Design</span><div class="diablo-skill-bar"><div class="diablo-skill-fill" style="width:95%"></div></div><span class="diablo-skill-level">20</span></div>
-      <div class="diablo-skill"><span class="diablo-skill-name">Creative Dir.</span><div class="diablo-skill-bar"><div class="diablo-skill-fill" style="width:92%"></div></div><span class="diablo-skill-level">19</span></div>
-      <div class="diablo-skill"><span class="diablo-skill-name">Frontend Dev</span><div class="diablo-skill-bar"><div class="diablo-skill-fill" style="width:88%"></div></div><span class="diablo-skill-level">18</span></div>
-      <div class="diablo-skill"><span class="diablo-skill-name">Beat Making</span><div class="diablo-skill-bar"><div class="diablo-skill-fill" style="width:72%"></div></div><span class="diablo-skill-level">15</span></div>
-      <div class="diablo-skill"><span class="diablo-skill-name">MTG Drafting</span><div class="diablo-skill-bar"><div class="diablo-skill-fill" style="width:80%"></div></div><span class="diablo-skill-level">17</span></div>
+  </div>
+</div>
+
+<!-- ── MTG COLLECTION ── -->
+<div class="xp-win" id="app-mtg" style="top:50px; left:560px; width:222px;">
+  <div class="window" style="background:#0e0600; border-color:#6a3008;">
+    <div class="title-bar" onmousedown="dragStart(event,'app-mtg')" style="background:linear-gradient(to right,#801008,#601008);">
+      <div class="title-bar-text">🃏 MTG Collection</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeApp('app-mtg')"></button>
+        <button aria-label="Maximize"></button>
+        <button aria-label="Close" onclick="closeApp('app-mtg')"></button>
+      </div>
+    </div>
+    <div class="window-body" style="padding:0">
+      <div class="mtg-body">
+        <div class="mtg-title">⚔ The Gathering ⚔</div>
+        <!-- Add/remove set buttons to change which sets are available -->
+        <div class="mtg-sets">
+          <button class="mtg-set-btn active" onclick="setMtgSet('ice',this)">Ice Age</button>
+          <button class="mtg-set-btn" onclick="setMtgSet('5ed',this)">5th Ed.</button>
+          <button class="mtg-set-btn" onclick="setMtgSet('all',this)">Alliances</button>
+        </div>
+        <div class="mtg-card" id="mtg-card">
+          <div class="mtg-loading">Shuffling library...</div>
+        </div>
+        <div class="mtg-name" id="mtg-name"></div>
+        <button class="mtg-draw" onclick="drawMtgCard()">✦ Draw Card ✦</button>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- FRUITYLOOPS -->
-<div class="window" id="win-fl" style="top:400px;left:340px;width:420px;">
-  <div class="window-titlebar" onmousedown="startDrag(event,'win-fl')" style="background:linear-gradient(to bottom,#1a6a1a,#0a4010);">
-    <span>🎹</span><span class="window-title-text">FruityLoops 3.4 — untitled.flp</span>
-    <div class="window-controls">
-      <div class="win-btn minimize" onclick="minimizeWindow('win-fl')">_</div>
-      <div class="win-btn maximize">□</div>
-      <div class="win-btn close" onclick="closeWindow('win-fl')">✕</div>
+<!-- ── MINESWEEPER ── -->
+<div class="xp-win" id="app-ms" style="top:380px; left:800px;">
+  <div class="window">
+    <div class="title-bar" onmousedown="dragStart(event,'app-ms')">
+      <div class="title-bar-text">💣 Minesweeper</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeApp('app-ms')"></button>
+        <button aria-label="Maximize"></button>
+        <button aria-label="Close" onclick="closeApp('app-ms')"></button>
+      </div>
+    </div>
+    <div class="window-body" style="padding:0">
+      <div class="ms-body" id="ms-body"><!-- injected --></div>
     </div>
   </div>
-  <div class="window-body fl-app" id="fl-container"></div>
 </div>
 
-<!-- TASKBAR -->
+<!-- ── AIM ── -->
+<div class="xp-win" id="app-aim" style="top:50px; left:812px; width:210px;">
+  <div class="window">
+    <div class="title-bar" onmousedown="dragStart(event,'app-aim')">
+      <div class="title-bar-text">💬 AIM 5.9</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeApp('app-aim')"></button>
+        <button aria-label="Maximize"></button>
+        <button aria-label="Close" onclick="closeApp('app-aim')"></button>
+      </div>
+    </div>
+    <div class="window-body" style="padding:0">
+      <div class="aim-head"><span class="aim-logo">🔵</span><span class="aim-headtxt">AOL Instant Messenger</span></div>
+      <div class="aim-bar">
+        <div class="aim-sn">DesignNerd87</div>
+        <div class="aim-status">Online — <span id="aim-timer">0:00:00</span></div>
+      </div>
+      <div class="aim-away">
+        <div class="aim-away-lbl">AWAY MESSAGE:</div>
+        <!-- ✏️ CUSTOMIZE: change this away message -->
+        brb, making beats in the garage. might also be playing d2. probably both.
+      </div>
+      <div class="aim-group-hdr"><span>Buddies (4/6)</span><span>▼</span></div>
+      <!-- ✏️ CUSTOMIZE: swap in real/fake buddy names + statuses -->
+      <div class="aim-buddy"><div class="aim-dot dot-on"></div>xXShadowmage99Xx</div>
+      <div class="aim-buddy"><div class="aim-dot dot-on"></div>KazaaQueen2002</div>
+      <div class="aim-buddy"><div class="aim-dot dot-aw"></div>ProducerMike_FL</div>
+      <div class="aim-buddy"><div class="aim-dot dot-on"></div>MTGTrader_Zach</div>
+      <div class="aim-buddy"><div class="aim-dot dot-off"></div>DiabloLAN_Steve</div>
+      <div class="aim-buddy"><div class="aim-dot dot-off"></div>FinePix_Fanatic</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── DIABLO II ── -->
+<div class="xp-win" id="app-d2" style="top:220px; left:60px; width:278px;">
+  <div class="window" style="background:#080300; border-color:#3a1000;">
+    <div class="title-bar" onmousedown="dragStart(event,'app-d2')" style="background:linear-gradient(to right,#680800,#380400);">
+      <div class="title-bar-text">⚔️ Diablo II: Lord of Destruction</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeApp('app-d2')"></button>
+        <button aria-label="Maximize"></button>
+        <button aria-label="Close" onclick="closeApp('app-d2')"></button>
+      </div>
+    </div>
+    <div class="window-body" style="padding:0">
+      <div class="d2-body">
+        <div class="d2-logo">DIABLO II</div>
+        <div class="d2-sub">LORD OF DESTRUCTION</div>
+        <div class="d2-char">
+          <div class="d2-portrait">💀</div>
+          <div class="d2-info">
+            <!-- ✏️ CUSTOMIZE: character name, class, stats -->
+            <div class="d2-name">Jesse</div>
+            <div class="d2-class">NECROMANCER · LVL 87</div>
+            <div class="d2-stat"><span class="d2-stat-l">Strength</span><span class="d2-stat-v">75</span></div>
+            <div class="d2-stat"><span class="d2-stat-l">Dexterity</span><span class="d2-stat-v">68</span></div>
+            <div class="d2-stat"><span class="d2-stat-l">Vitality</span><span class="d2-stat-v">300</span></div>
+            <div class="d2-stat"><span class="d2-stat-l">Energy</span><span class="d2-stat-v">142</span></div>
+            <div class="d2-stat"><span class="d2-stat-l">Gold</span><span class="d2-stat-v">2,847,391</span></div>
+          </div>
+        </div>
+        <div class="d2-skills-hdr">SKILL TREE</div>
+        <!-- ✏️ CUSTOMIZE: skill names and levels (width % = level/20 * 100) -->
+        <div class="d2-skill"><span class="d2-skill-name">Brand Design</span><div class="d2-bar"><div class="d2-fill" style="width:95%"></div></div><span class="d2-lvl">20</span></div>
+        <div class="d2-skill"><span class="d2-skill-name">Creative Dir.</span><div class="d2-bar"><div class="d2-fill" style="width:92%"></div></div><span class="d2-lvl">19</span></div>
+        <div class="d2-skill"><span class="d2-skill-name">Frontend Dev</span><div class="d2-bar"><div class="d2-fill" style="width:88%"></div></div><span class="d2-lvl">18</span></div>
+        <div class="d2-skill"><span class="d2-skill-name">Beat Making</span><div class="d2-bar"><div class="d2-fill" style="width:72%"></div></div><span class="d2-lvl">15</span></div>
+        <div class="d2-skill"><span class="d2-skill-name">MTG Drafting</span><div class="d2-bar"><div class="d2-fill" style="width:80%"></div></div><span class="d2-lvl">17</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── FRUITYLOOPS ── -->
+<div class="xp-win" id="app-fl" style="top:440px; left:355px; width:420px;">
+  <div class="window" style="background:#1a1a1a; border-color:#205020;">
+    <div class="title-bar" onmousedown="dragStart(event,'app-fl')" style="background:linear-gradient(to right,#287028,#144814);">
+      <div class="title-bar-text">🎹 FruityLoops 3.4 — untitled.flp</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeApp('app-fl')"></button>
+        <button aria-label="Maximize"></button>
+        <button aria-label="Close" onclick="closeApp('app-fl')"></button>
+      </div>
+    </div>
+    <div class="window-body" style="padding:0">
+      <div class="fl-body" id="fl-body"><!-- injected --></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════ TASKBAR ═══════════════════════════ -->
 <div id="taskbar">
-  <button id="start-btn" onclick="toggleStartMenu()">🪟 Start</button>
-  <div id="taskbar-apps"></div>
+  <button id="start-btn" onclick="toggleStartMenu(event)">
+    <span style="font-size:16px">🪟</span> Start
+  </button>
+  <div id="tb-apps"></div>
   <div id="systray">
     <span>🔊</span>
     <span id="clock">12:00 PM</span>
   </div>
 </div>
 
-<!-- START MENU -->
-<div id="start-menu">
-  <div class="start-menu-header">
-    <div class="start-menu-avatar">🤠</div>
-    <div>Jesse Vaughan</div>
+<!-- ═══════════════════════════ START MENU ═══════════════════════════ -->
+<div id="smenu">
+  <div class="sm-head">
+    <div class="sm-av">🤠</div>
+    <div class="sm-name">Jesse Vaughan</div>
   </div>
-  <div class="start-menu-items">
-    <div class="start-menu-item" onclick="openWindow('winamp');closeStartMenu()"><span class="item-icon">🎵</span>Winamp 2.95</div>
-    <div class="start-menu-item" onclick="openWindow('mtg');closeStartMenu()"><span class="item-icon">🃏</span>MTG Collection</div>
-    <div class="start-menu-item" onclick="openWindow('minesweeper');closeStartMenu()"><span class="item-icon">💣</span>Minesweeper</div>
-    <div class="start-menu-item" onclick="openWindow('diablo');closeStartMenu()"><span class="item-icon">⚔️</span>Diablo II: Lord of Destruction</div>
-    <div class="start-menu-item" onclick="openWindow('fl');closeStartMenu()"><span class="item-icon">🎹</span>FruityLoops 3.4</div>
-    <div class="start-menu-item" onclick="openWindow('aim');closeStartMenu()"><span class="item-icon">💬</span>AIM 5.9</div>
-    <div class="start-menu-divider"></div>
-    <div class="start-menu-item" onclick="window.location.href='/'"><span class="item-icon">🌐</span>← Back to jessevaughan.com</div>
+  <div class="sm-body">
+    <div class="sm-item" onclick="openApp('wa');  closeStartMenu()"><span class="sm-icon">🎵</span> Winamp 2.95</div>
+    <div class="sm-item" onclick="openApp('mtg'); closeStartMenu()"><span class="sm-icon">🃏</span> MTG Collection</div>
+    <div class="sm-item" onclick="openApp('ms');  closeStartMenu()"><span class="sm-icon">💣</span> Minesweeper</div>
+    <div class="sm-item" onclick="openApp('d2');  closeStartMenu()"><span class="sm-icon">⚔️</span> Diablo II</div>
+    <div class="sm-item" onclick="openApp('fl');  closeStartMenu()"><span class="sm-icon">🎹</span> FruityLoops 3.4</div>
+    <div class="sm-item" onclick="openApp('aim'); closeStartMenu()"><span class="sm-icon">💬</span> AIM 5.9</div>
+    <div class="sm-div"></div>
+    <div class="sm-item" onclick="location.href='/'"><span class="sm-icon">🌐</span> ← jessevaughan.com</div>
   </div>
-  <div class="start-menu-footer">
-    <button onclick="triggerError()">🔴 Turn Off Computer</button>
+  <div class="sm-foot">
+    <button onclick="showError()">🔴 Turn Off Computer</button>
   </div>
 </div>
 
-<!-- ERROR POPUP -->
-<div class="error-popup" id="error-popup">
-  <div class="error-titlebar">⚠️ Error</div>
-  <div class="error-body">
-    <span class="error-icon">❌</span>
-    <div id="error-msg">An unknown error has occurred.</div>
-  </div>
-  <div class="error-btn-row">
-    <button class="error-btn" onclick="closeError()">OK</button>
-    <button class="error-btn" onclick="closeError()">Cancel</button>
-    <button class="error-btn" onclick="closeError()">Ignore</button>
+<!-- ═══════════════════════════ ERROR POPUP ═══════════════════════════ -->
+<div id="err-popup">
+  <div class="window">
+    <div class="title-bar" onmousedown="dragStart(event,'err-popup')">
+      <div class="title-bar-text">⚠ Error</div>
+      <div class="title-bar-controls">
+        <button aria-label="Close" onclick="closeError()"></button>
+      </div>
+    </div>
+    <div class="window-body">
+      <div style="display:flex;gap:12px;align-items:flex-start;padding:4px;white-space:pre-line">
+        <span style="font-size:28px;flex-shrink:0">❌</span>
+        <div id="err-msg" style="line-height:1.5"></div>
+      </div>
+      <div style="display:flex;justify-content:center;gap:6px;margin-top:10px">
+        <button onclick="closeError()">OK</button>
+        <button onclick="closeError()">Cancel</button>
+        <button onclick="closeError()">Ignore</button>
+      </div>
+    </div>
   </div>
 </div>
+
 
 <script>
-// ═══════════════════════════════════════
-// WINDOW MANAGER
-// ═══════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+//  WINDOW MANAGER
+// ═══════════════════════════════════════════════════════
 let zTop = 100;
 const minimized = {};
 
-const winMeta = {
-  winamp:      { icon: '🎵', label: 'Winamp' },
-  mtg:         { icon: '🃏', label: 'MTG' },
-  minesweeper: { icon: '💣', label: 'Minesweeper' },
-  aim:         { icon: '💬', label: 'AIM' },
-  diablo:      { icon: '⚔️', label: 'Diablo II' },
-  fl:          { icon: '🎹', label: 'FruityLoops' },
+// App registry — add new apps here
+const APPS = {
+  wa:  { icon: '🎵', label: 'Winamp'      },
+  mtg: { icon: '🃏', label: 'MTG'         },
+  ms:  { icon: '💣', label: 'Minesweeper' },
+  aim: { icon: '💬', label: 'AIM'         },
+  d2:  { icon: '⚔️',  label: 'Diablo II'  },
+  fl:  { icon: '🎹', label: 'FruityLoops' },
 };
 
-function openWindow(id) {
-  const win = document.getElementById('win-' + id);
-  if (!win) return;
-  win.style.display = 'flex';
-  win.style.flexDirection = 'column';
-  delete minimized['win-' + id];
-  focusWin(win);
-  updateTaskbar();
-  if (!win.dataset.init) {
-    win.dataset.init = '1';
-    if (id === 'minesweeper') initMinesweeper();
-    if (id === 'fl') initFL();
+function openApp(id) {
+  const el = document.getElementById('app-' + id);
+  if (!el) return;
+  el.style.display = 'block';
+  delete minimized['app-' + id];
+  focus(el);
+  rebuildTaskbar();
+  // Init on first open
+  if (!el.dataset.ready) {
+    el.dataset.ready = '1';
+    if (id === 'wa')  initWinamp();
+    if (id === 'ms')  initMinesweeper();
+    if (id === 'fl')  initFL();
     if (id === 'mtg') drawMtgCard();
-    if (id === 'winamp') initWinamp();
   }
 }
 
-function closeWindow(winId) {
-  const win = document.getElementById(winId);
-  if (win) { win.style.display = 'none'; delete minimized[winId]; updateTaskbar(); }
+function closeApp(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.style.display = 'none';
+  delete minimized[id];
+  rebuildTaskbar();
 }
 
-function minimizeWindow(winId) {
-  const win = document.getElementById(winId);
-  if (win) { win.style.display = 'none'; minimized[winId] = true; updateTaskbar(); }
+function minimizeApp(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.style.display = 'none';
+  minimized[id] = true;
+  rebuildTaskbar();
 }
 
-function focusWin(win) {
-  document.querySelectorAll('.window').forEach(w => w.classList.add('inactive'));
-  win.classList.remove('inactive');
-  zTop++;
-  win.style.zIndex = zTop;
+function focus(el) {
+  document.querySelectorAll('.xp-win, #err-popup').forEach(w => {
+    w.querySelector('.title-bar')?.classList.add('inactive');
+  });
+  el.querySelector('.title-bar')?.classList.remove('inactive');
+  el.style.zIndex = ++zTop;
 }
 
-function updateTaskbar() {
-  const bar = document.getElementById('taskbar-apps');
+function rebuildTaskbar() {
+  const bar = document.getElementById('tb-apps');
   bar.innerHTML = '';
-  Object.entries(winMeta).forEach(([id, meta]) => {
-    const winId = 'win-' + id;
-    const win = document.getElementById(winId);
-    const visible = win && win.style.display !== 'none';
-    const isMin = minimized[winId];
+  Object.entries(APPS).forEach(([id, meta]) => {
+    const el = document.getElementById('app-' + id);
+    const visible = el && el.style.display !== 'none';
+    const isMin   = minimized['app-' + id];
     if (!visible && !isMin) return;
-    const btn = document.createElement('div');
-    btn.className = 'taskbar-app' + (visible ? ' focused' : '');
-    btn.innerHTML = `${meta.icon} ${meta.label}`;
+    const btn = document.createElement('button');
+    btn.className = 'tb-btn' + (visible ? ' active' : '');
+    btn.textContent = meta.icon + ' ' + meta.label;
     btn.onclick = () => {
-      if (isMin || !visible) {
-        openWindow(id);
-      } else {
-        minimizeWindow(winId);
-      }
+      if (!visible || isMin) openApp(id);
+      else minimizeApp('app-' + id);
     };
     bar.appendChild(btn);
   });
 }
 
-// ── DRAGGING ──
+// Focus window on click anywhere on it
+document.querySelectorAll('.xp-win').forEach(el => {
+  el.addEventListener('mousedown', () => { focus(el); rebuildTaskbar(); });
+});
+document.getElementById('desktop').addEventListener('click', closeStartMenu);
+
+// ── DRAG ──
 let drag = null;
 
-function startDrag(e, winId) {
-  const win = document.getElementById(winId);
-  focusWin(win); updateTaskbar();
-  drag = {
-    winId,
-    sx: e.clientX, sy: e.clientY,
-    ox: parseInt(win.style.left) || win.offsetLeft,
-    oy: parseInt(win.style.top) || win.offsetTop,
-  };
+function dragStart(e, id) {
+  if (e.target.tagName === 'BUTTON') return; // don't drag when clicking controls
+  const el = document.getElementById(id);
+  focus(el); rebuildTaskbar();
+  const r = el.getBoundingClientRect();
+  drag = { id, ox: r.left, oy: r.top, sx: e.clientX, sy: e.clientY };
   e.preventDefault();
 }
 
 document.addEventListener('mousemove', e => {
   if (!drag) return;
-  const win = document.getElementById(drag.winId);
-  win.style.left = (drag.ox + e.clientX - drag.sx) + 'px';
-  win.style.top  = (drag.oy + e.clientY - drag.sy) + 'px';
+  const el = document.getElementById(drag.id);
+  el.style.left = (drag.ox + e.clientX - drag.sx) + 'px';
+  el.style.top  = (drag.oy + e.clientY - drag.sy) + 'px';
 });
 document.addEventListener('mouseup', () => drag = null);
 
-document.querySelectorAll('.window').forEach(win => {
-  win.addEventListener('mousedown', () => { focusWin(win); updateTaskbar(); });
-});
-document.getElementById('desktop').addEventListener('click', closeStartMenu);
 
-// ═══════════════════════════════════════
-// CLOCK + AIM TIMER
-// ═══════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+//  CLOCK + AIM TIMER
+// ═══════════════════════════════════════════════════════
 let aimSeconds = 0;
-function updateClock() {
+setInterval(() => {
   const now = new Date();
-  let h = now.getHours(), m = now.getMinutes().toString().padStart(2,'0');
-  const ampm = h >= 12 ? 'PM' : 'AM';
-  h = h % 12 || 12;
-  document.getElementById('clock').textContent = `${h}:${m} ${ampm}`;
+  let h = now.getHours(), m = String(now.getMinutes()).padStart(2, '0');
+  const ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
+  document.getElementById('clock').textContent = `${h}:${m} ${ap}`;
+
   aimSeconds++;
-  const ah = Math.floor(aimSeconds/3600), am = Math.floor((aimSeconds%3600)/60), as2 = aimSeconds%60;
-  const el = document.getElementById('aim-timer');
-  if (el) el.textContent = `${ah}:${String(am).padStart(2,'0')}:${String(as2).padStart(2,'0')}`;
-}
-updateClock();
-setInterval(updateClock, 1000);
+  const ah = Math.floor(aimSeconds / 3600);
+  const am = Math.floor((aimSeconds % 3600) / 60);
+  const as = aimSeconds % 60;
+  const t = document.getElementById('aim-timer');
+  if (t) t.textContent = `${ah}:${String(am).padStart(2,'0')}:${String(as).padStart(2,'0')}`;
+}, 1000);
 
-// ═══════════════════════════════════════
-// START MENU
-// ═══════════════════════════════════════
-function toggleStartMenu() {
-  document.getElementById('start-menu').classList.toggle('open');
-  event.stopPropagation();
-}
-function closeStartMenu() { document.getElementById('start-menu').classList.remove('open'); }
 
-// ═══════════════════════════════════════
-// ERROR POPUPS
-// ═══════════════════════════════════════
-const errors = [
-  "FATAL ERROR: Too many sick beats. System overwhelmed.",
-  "WARNING: MTG card collection exceeds recommended limits.\nPlease add more shelf space.",
-  "ERROR: Diablo II ran out of mana. Please insert more coffee.",
-  "CRITICAL: Design system approaching perfection. Reboot required.",
-  "ERROR 404: Sleep not found. Resuming work.",
-  "RUNTIME ERROR: FruityLoops 3.4 has performed an illegal operation\nand will be shut down.",
-  "WARNING: Joshua Tree vibes dangerously high.\nDesert temperature threshold exceeded.",
-  "Kazaa download complete: 1 file (Eminem - Without Me.mp3)\nEstimated size: 3.4MB",
+// ═══════════════════════════════════════════════════════
+//  START MENU
+// ═══════════════════════════════════════════════════════
+function toggleStartMenu(e) { e.stopPropagation(); document.getElementById('smenu').classList.toggle('open'); }
+function closeStartMenu() { document.getElementById('smenu').classList.remove('open'); }
+
+
+// ═══════════════════════════════════════════════════════
+//  ERROR POPUPS
+// ═══════════════════════════════════════════════════════
+// ✏️ CUSTOMIZE: add/change error messages
+const ERRORS = [
+  "FATAL ERROR: Too many sick beats.\nSystem overwhelmed.",
+  "WARNING: MTG collection exceeds recommended limits.\nPlease acquire more shelf space.",
+  "ERROR: Diablo II ran out of mana.\nPlease insert more coffee.",
+  "CRITICAL: Design system approaching perfection.\nEmergency reboot required.",
+  "ERROR 404: Sleep not found.\nResuming work.",
+  "FruityLoops 3.4 has performed an illegal\noperation and will be shut down.",
+  "WARNING: Joshua Tree vibes critically high.\nDesktop temperature threshold exceeded.",
+  "Kazaa download complete:\n'Eminem - Without Me.mp3' (3.4MB, 128kbps)",
 ];
 let errIdx = 0;
 
-function triggerError() {
-  const popup = document.getElementById('error-popup');
-  document.getElementById('error-msg').textContent = errors[errIdx++ % errors.length];
-  popup.style.left = (100 + Math.random() * 400) + 'px';
-  popup.style.top  = (80  + Math.random() * 300) + 'px';
-  popup.classList.add('visible');
-  popup.style.zIndex = ++zTop;
+function showError() {
+  const p = document.getElementById('err-popup');
+  document.getElementById('err-msg').textContent = ERRORS[errIdx++ % ERRORS.length];
+  p.style.left = (80  + Math.random() * 500) + 'px';
+  p.style.top  = (60  + Math.random() * 280) + 'px';
+  p.style.zIndex = ++zTop;
+  p.classList.add('show');
 }
-function closeError() { document.getElementById('error-popup').classList.remove('visible'); }
-setInterval(() => { if (Math.random() < 0.2) triggerError(); }, 45000);
+function closeError() { document.getElementById('err-popup').classList.remove('show'); }
+// Occasional random error
+setInterval(() => { if (Math.random() < 0.12) showError(); }, 50000);
 
-// ═══════════════════════════════════════
-// WINAMP
-// ═══════════════════════════════════════
-const tracks = [
-  "Boards of Canada - Aquarius",
-  "Daft Punk - Digital Love",
-  "Aphex Twin - Xtal",
-  "Portishead - Sour Times",
-  "Massive Attack - Teardrop",
-  "Chemical Brothers - Block Rockin Beats",
-  "Prodigy - Firestarter",
+
+// ═══════════════════════════════════════════════════════
+//  WINAMP
+// ═══════════════════════════════════════════════════════
+// ✏️ CUSTOMIZE: swap out track names with anything you want
+const TRACKS = [
+  'Boards of Canada - Aquarius',
+  'Daft Punk - Digital Love',
+  'Aphex Twin - Xtal',
+  'Portishead - Sour Times',
+  'Massive Attack - Teardrop',
+  'Chemical Brothers - Block Rockin Beats',
+  'Prodigy - Firestarter',
+  'Radiohead - Everything In Its Right Place',
 ];
-let wTrack = 0, wSecs = 134, wPlaying = true, wTimer = null;
+
+let waTrack = 0, waSeconds = 134, waPlaying = true;
 
 function initWinamp() {
-  const viz = document.getElementById('winamp-viz');
-  for (let i = 0; i < 22; i++) {
+  // Build visualizer bars
+  const viz = document.getElementById('wa-viz');
+  for (let i = 0; i < 24; i++) {
     const b = document.createElement('div');
-    b.className = 'winamp-viz-bar';
-    b.style.setProperty('--h1', (Math.random()*6+2) + 'px');
-    b.style.setProperty('--h2', (Math.random()*14+4) + 'px');
-    b.style.animationDelay = (Math.random()*0.4) + 's';
-    b.style.animationDuration = (0.06+Math.random()*0.14) + 's';
+    b.className = 'wa-bar';
+    b.style.setProperty('--lo', (Math.random() * 4 + 2) + 'px');
+    b.style.setProperty('--hi', (Math.random() * 14 + 4) + 'px');
+    b.style.animationDelay    = (Math.random() * 0.5) + 's';
+    b.style.animationDuration = (0.06 + Math.random() * 0.14) + 's';
     viz.appendChild(b);
   }
-  wTimer = setInterval(() => {
-    if (!wPlaying) return;
-    wSecs++;
-    const m = Math.floor(wSecs/60), s = String(wSecs%60).padStart(2,'0');
-    const el = document.getElementById('winamp-time');
-    if (el) el.textContent = `${m}:${s}`;
-    if (wSecs > 240) { wSecs = 0; wTrack = (wTrack+1)%tracks.length; updateWTrack(); }
-  }, 1000);
-  document.querySelectorAll('.winamp-playlist-item').forEach(el => {
-    el.addEventListener('click', () => {
-      wTrack = parseInt(el.dataset.idx); wSecs = 0; wPlaying = true; updateWTrack();
-      document.getElementById('winamp-play-btn').textContent = '⏸';
-    });
-  });
-}
-function updateWTrack() {
-  const el = document.getElementById('winamp-track');
-  if (el) el.textContent = '▶ ' + tracks[wTrack];
-  document.querySelectorAll('.winamp-playlist-item').forEach(e => {
-    e.classList.toggle('active', parseInt(e.dataset.idx) === wTrack);
-  });
-}
-function winampPlayPause() {
-  wPlaying = !wPlaying;
-  document.getElementById('winamp-play-btn').textContent = wPlaying ? '⏸' : '▶';
-}
-function winampNext() { wTrack = (wTrack+1)%tracks.length; wSecs=0; updateWTrack(); }
-function winampPrev() { wTrack = (wTrack-1+tracks.length)%tracks.length; wSecs=0; updateWTrack(); }
 
-// ═══════════════════════════════════════
-// MTG CARD VIEWER
-// ═══════════════════════════════════════
+  // Build playlist
+  const list = document.getElementById('wa-list');
+  TRACKS.forEach((name, i) => {
+    const li = document.createElement('div');
+    li.className = 'wa-li' + (i === 0 ? ' now' : '');
+    li.dataset.i = i;
+    li.innerHTML = `<span class="wa-num">${String(i+1).padStart(2,'0')}</span>${name}`;
+    li.addEventListener('click', () => { waTrack = i; waSeconds = 0; waPlaying = true; updateWinamp(); document.getElementById('wa-pb').textContent='▐▐'; });
+    list.appendChild(li);
+  });
+
+  // Tick timer
+  setInterval(() => {
+    if (!waPlaying) return;
+    waSeconds++;
+    const m = Math.floor(waSeconds / 60), s = String(waSeconds % 60).padStart(2,'0');
+    const el = document.getElementById('wa-time'); if (el) el.textContent = `${m}:${s}`;
+    if (waSeconds > 240) { waSeconds = 0; waTrack = (waTrack + 1) % TRACKS.length; updateWinamp(); }
+  }, 1000);
+}
+
+function updateWinamp() {
+  const el = document.getElementById('wa-track'); if (el) el.textContent = '▶ ' + TRACKS[waTrack];
+  document.querySelectorAll('.wa-li').forEach(li => li.classList.toggle('now', parseInt(li.dataset.i) === waTrack));
+}
+function waToggle() { waPlaying = !waPlaying; const pb = document.getElementById('wa-pb'); if (pb) pb.textContent = waPlaying ? '▐▐' : '▶'; }
+function waNext()   { waTrack = (waTrack + 1) % TRACKS.length; waSeconds = 0; updateWinamp(); }
+function waPrev()   { waTrack = (waTrack - 1 + TRACKS.length) % TRACKS.length; waSeconds = 0; updateWinamp(); }
+
+
+// ═══════════════════════════════════════════════════════
+//  MTG CARD VIEWER
+// ═══════════════════════════════════════════════════════
 let mtgSet = 'ice';
+
 function setMtgSet(set, btn) {
   mtgSet = set;
   document.querySelectorAll('.mtg-set-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 }
+
 async function drawMtgCard() {
-  const d = document.getElementById('mtg-card-display');
-  d.innerHTML = '<div class="mtg-card-loading">Shuffling library...</div>';
+  const card = document.getElementById('mtg-card');
+  const name = document.getElementById('mtg-name');
+  card.innerHTML = '<div class="mtg-loading">Shuffling library...</div>';
+  name.textContent = '';
   try {
-    const res = await fetch(`https://api.scryfall.com/cards/random?q=set:${mtgSet}`);
-    const card = await res.json();
-    let img = card.image_uris?.normal || card.card_faces?.[0]?.image_uris?.normal;
-    d.innerHTML = img
-      ? `<img src="${img}" alt="${card.name}" />`
-      : `<div class="mtg-card-loading">${card.name}<br/><em>${card.type_line||''}</em></div>`;
+    const res  = await fetch(`https://api.scryfall.com/cards/random?q=set:${mtgSet}`);
+    const data = await res.json();
+    const img  = data.image_uris?.normal || data.card_faces?.[0]?.image_uris?.normal;
+    if (img) {
+      card.innerHTML = `<img src="${img}" alt="${data.name}">`;
+      name.textContent = data.name;
+    } else {
+      card.innerHTML = `<div class="mtg-loading">${data.name}<br><em>${data.type_line || ''}</em></div>`;
+    }
   } catch {
-    d.innerHTML = '<div class="mtg-card-loading">Spell fizzled.<br/>Try again.</div>';
+    card.innerHTML = '<div class="mtg-loading">Spell fizzled.<br>Try again.</div>';
   }
 }
 
-// ═══════════════════════════════════════
-// MINESWEEPER
-// ═══════════════════════════════════════
-const R=9, C=9, MINES=10;
-let board=[], gameOver=false, firstClick=true, msTimer=0, msTimerInt=null;
+
+// ═══════════════════════════════════════════════════════
+//  MINESWEEPER
+// ═══════════════════════════════════════════════════════
+const ROWS = 9, COLS = 9, MINE_COUNT = 10;
+let board = [], gameOver = false, firstClick = true, msTime = 0, msInterval = null, flagCount = MINE_COUNT;
 
 function initMinesweeper() {
-  board=[]; gameOver=false; firstClick=true; msTimer=0;
-  clearInterval(msTimerInt);
-  for (let r=0;r<R;r++) {
-    board[r]=[];
-    for (let c=0;c<C;c++) board[r][c]={mine:false,revealed:false,flagged:false,adj:0};
-  }
-  renderMS();
+  board = []; gameOver = false; firstClick = true; msTime = 0; flagCount = MINE_COUNT;
+  clearInterval(msInterval);
+  for (let r = 0; r < ROWS; r++) { board[r] = []; for (let c = 0; c < COLS; c++) board[r][c] = {mine:false,open:false,flag:false,adj:0}; }
+  renderMinesweeper();
 }
 
-function placeMines(ar,ac) {
-  let p=0;
-  while(p<MINES){
-    const r=Math.floor(Math.random()*R), c=Math.floor(Math.random()*C);
-    if (!board[r][c].mine && !(r===ar&&c===ac)) { board[r][c].mine=true; p++; }
+function placeMines(avoidR, avoidC) {
+  let placed = 0;
+  while (placed < MINE_COUNT) {
+    const r = Math.floor(Math.random() * ROWS), c = Math.floor(Math.random() * COLS);
+    if (!board[r][c].mine && !(r === avoidR && c === avoidC)) { board[r][c].mine = true; placed++; }
   }
-  for(let r=0;r<R;r++) for(let c=0;c<C;c++) {
-    if(board[r][c].mine) continue;
-    let n=0;
-    for(let dr=-1;dr<=1;dr++) for(let dc=-1;dc<=1;dc++) {
-      const nr=r+dr,nc=c+dc;
-      if(nr>=0&&nr<R&&nc>=0&&nc<C&&board[nr][nc].mine) n++;
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+    if (board[r][c].mine) continue;
+    let n = 0;
+    for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+      const nr = r+dr, nc = c+dc;
+      if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS && board[nr][nc].mine) n++;
     }
-    board[r][c].adj=n;
+    board[r][c].adj = n;
   }
 }
 
-function renderMS() {
-  const cont = document.getElementById('ms-container');
-  cont.innerHTML = `
-    <div class="ms-header">
-      <div class="ms-counter" id="ms-mines">${String(MINES).padStart(3,'0')}</div>
-      <div class="ms-face-btn" id="ms-face" onclick="initMinesweeper()">🙂</div>
-      <div class="ms-counter" id="ms-timer">000</div>
+function renderMinesweeper() {
+  document.getElementById('ms-body').innerHTML = `
+    <div class="ms-head">
+      <div class="ms-count" id="ms-flags">${String(flagCount).padStart(3,'0')}</div>
+      <div class="ms-face" id="ms-face" onclick="initMinesweeper()">🙂</div>
+      <div class="ms-count" id="ms-time">000</div>
     </div>
-    <div class="ms-grid" id="ms-grid" style="grid-template-columns:repeat(${C},22px)"></div>`;
-  const grid=document.getElementById('ms-grid');
-  for(let r=0;r<R;r++) for(let c=0;c<C;c++) {
-    const cell=document.createElement('div');
-    cell.className='ms-cell'; cell.dataset.r=r; cell.dataset.c=c;
-    cell.addEventListener('click',()=>msReveal(r,c));
-    cell.addEventListener('contextmenu',e=>{e.preventDefault();msFlag(r,c);});
+    <div class="ms-grid" id="ms-grid" style="grid-template-columns:repeat(${COLS},22px)"></div>`;
+  const grid = document.getElementById('ms-grid');
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+    const cell = document.createElement('div');
+    cell.className = 'ms-cell'; cell.dataset.r = r; cell.dataset.c = c;
+    cell.addEventListener('click', () => msOpen(r, c));
+    cell.addEventListener('contextmenu', e => { e.preventDefault(); msFlag(r, c); });
     grid.appendChild(cell);
   }
 }
 
-function msReveal(r,c) {
-  if(gameOver||board[r][c].revealed||board[r][c].flagged) return;
-  if(firstClick) {
-    firstClick=false; placeMines(r,c);
-    msTimerInt=setInterval(()=>{ msTimer++;
-      const el=document.getElementById('ms-timer');
-      if(el) el.textContent=String(Math.min(msTimer,999)).padStart(3,'0');
-    },1000);
+function msOpen(r, c) {
+  if (gameOver || board[r][c].open || board[r][c].flag) return;
+  if (firstClick) {
+    firstClick = false; placeMines(r, c);
+    msInterval = setInterval(() => { msTime++; const el = document.getElementById('ms-time'); if (el) el.textContent = String(Math.min(msTime, 999)).padStart(3,'0'); }, 1000);
   }
-  board[r][c].revealed=true;
-  if(board[r][c].mine) {
-    gameOver=true; clearInterval(msTimerInt);
-    document.getElementById('ms-face').textContent='😵';
-    for(let rr=0;rr<R;rr++) for(let cc=0;cc<C;cc++) if(board[rr][cc].mine) board[rr][cc].revealed=true;
-  } else if(board[r][c].adj===0) {
-    for(let dr=-1;dr<=1;dr++) for(let dc=-1;dc<=1;dc++) {
-      const nr=r+dr,nc=c+dc;
-      if(nr>=0&&nr<R&&nc>=0&&nc<C) msReveal(nr,nc);
+  board[r][c].open = true;
+  if (board[r][c].mine) {
+    gameOver = true; clearInterval(msInterval);
+    const face = document.getElementById('ms-face'); if (face) face.textContent = '😵';
+    for (let rr=0;rr<ROWS;rr++) for (let cc=0;cc<COLS;cc++) if (board[rr][cc].mine) board[rr][cc].open = true;
+  } else if (board[r][c].adj === 0) {
+    for (let dr=-1;dr<=1;dr++) for (let dc=-1;dc<=1;dc++) {
+      const nr=r+dr, nc=c+dc;
+      if (nr>=0&&nr<ROWS&&nc>=0&&nc<COLS) msOpen(nr, nc);
     }
   }
-  updateMSGrid();
-  if(!gameOver){
-    let unsafe=0;
-    for(let rr=0;rr<R;rr++) for(let cc=0;cc<C;cc++) if(!board[rr][cc].mine&&!board[rr][cc].revealed) unsafe++;
-    if(unsafe===0){ gameOver=true; clearInterval(msTimerInt); document.getElementById('ms-face').textContent='😎'; }
+  renderMsGrid();
+  if (!gameOver) {
+    let remaining = 0;
+    for (let rr=0;rr<ROWS;rr++) for (let cc=0;cc<COLS;cc++) if (!board[rr][cc].mine && !board[rr][cc].open) remaining++;
+    if (remaining === 0) { gameOver=true; clearInterval(msInterval); const face=document.getElementById('ms-face'); if(face)face.textContent='😎'; }
   }
 }
 
-function msFlag(r,c) {
-  if(gameOver||board[r][c].revealed) return;
-  board[r][c].flagged=!board[r][c].flagged;
-  const el=document.getElementById('ms-mines');
-  const cur=parseInt(el.textContent);
-  el.textContent=String(cur+(board[r][c].flagged?-1:1)).padStart(3,'0');
-  updateMSGrid();
+function msFlag(r, c) {
+  if (gameOver || board[r][c].open) return;
+  board[r][c].flag = !board[r][c].flag;
+  flagCount += board[r][c].flag ? -1 : 1;
+  const el = document.getElementById('ms-flags'); if (el) el.textContent = String(flagCount).padStart(3,'0');
+  renderMsGrid();
 }
 
-function updateMSGrid() {
-  document.querySelectorAll('.ms-cell').forEach(el=>{
-    const r=parseInt(el.dataset.r), c=parseInt(el.dataset.c), cell=board[r][c];
-    el.className='ms-cell'; el.textContent='';
-    if(cell.flagged&&!cell.revealed) { el.textContent='🚩'; }
-    else if(cell.revealed) {
-      el.classList.add('revealed');
-      if(cell.mine) { el.classList.add('mine'); el.textContent='💣'; }
-      else if(cell.adj>0) { el.textContent=cell.adj; el.classList.add(`ms-num-${cell.adj}`); }
+function renderMsGrid() {
+  document.querySelectorAll('.ms-cell').forEach(el => {
+    const r = parseInt(el.dataset.r), c = parseInt(el.dataset.c), cell = board[r][c];
+    el.className = 'ms-cell'; el.textContent = '';
+    if (cell.flag && !cell.open) { el.textContent = '🚩'; }
+    else if (cell.open) {
+      el.classList.add('open');
+      if (cell.mine) { el.classList.add('dead'); el.textContent = '💣'; }
+      else if (cell.adj > 0) { el.textContent = cell.adj; el.classList.add('n' + cell.adj); }
     }
   });
 }
 
-// ═══════════════════════════════════════
-// FRUITYLOOPS
-// ═══════════════════════════════════════
-const FL_TRACKS=[
-  {name:'Kick', cls:'kick'},
-  {name:'Snare',cls:'snare'},
-  {name:'Hi-Hat',cls:'hihat'},
-  {name:'Bass', cls:'bass'},
+
+// ═══════════════════════════════════════════════════════
+//  FRUITYLOOPS
+// ═══════════════════════════════════════════════════════
+// ✏️ CUSTOMIZE: track names and initial pattern
+const FL_TRACKS = [
+  { name: 'Kick',   cls: 'kick'  },
+  { name: 'Snare',  cls: 'snare' },
+  { name: 'Hi-Hat', cls: 'hihat' },
+  { name: 'Bass',   cls: 'bass'  },
 ];
-const STEPS=16;
-let pads=[], flStep=-1, flPlaying=false, flBPM=120, flInt=null, audioCtx=null;
+const FL_STEPS = 16;
+let flPads = [], flStep = -1, flPlaying = false, flBPM = 120, flTimer = null, audioCtx = null;
 
 function initFL() {
-  pads=FL_TRACKS.map(()=>Array(STEPS).fill(false));
-  // Default pattern
-  [0,4,8,12].forEach(s=>pads[0][s]=true);
-  [4,12].forEach(s=>pads[1][s]=true);
-  [2,6,10,14].forEach(s=>pads[2][s]=true);
-  [0,6,10].forEach(s=>pads[3][s]=true);
+  flPads = FL_TRACKS.map(() => Array(FL_STEPS).fill(false));
+  // Default pattern — edit these arrays to change the beat
+  [0,4,8,12].forEach(s => flPads[0][s] = true);  // Kick
+  [4,12].forEach(s => flPads[1][s] = true);        // Snare
+  [2,6,10,14].forEach(s => flPads[2][s] = true);   // Hi-hat
+  [0,6,10].forEach(s => flPads[3][s] = true);      // Bass
   renderFL();
 }
 
 function renderFL() {
-  const cont=document.getElementById('fl-container');
-  let h=`<div class="fl-toolbar">
-    <button class="fl-toolbar-btn" id="fl-play" onclick="flToggle()">▶ Play</button>
-    <button class="fl-toolbar-btn" onclick="flStop()">⏹ Stop</button>
-    <button class="fl-toolbar-btn" onclick="flClear()">✕ Clear</button>
-    <span class="fl-bpm">BPM: <span class="fl-bpm-value" id="fl-bpm-disp">${flBPM}</span></span>
-    <input type="range" min="60" max="200" value="${flBPM}" style="width:55px;cursor:pointer" oninput="flSetBPM(this.value)" />
-  </div>
-  <div class="fl-step-header">
-    <div></div>
-    ${Array.from({length:STEPS},(_,i)=>`<div class="fl-step-num${i%4===0?' beat':''}">${i+1}</div>`).join('')}
-  </div>`;
-  FL_TRACKS.forEach((t,ti)=>{
-    h+=`<div class="fl-track"><div class="fl-track-name">${t.name}</div>
-    ${Array.from({length:STEPS},(_,si)=>
-      `<div class="fl-pad ${t.cls} ${pads[ti][si]?'active':''}" id="fp-${ti}-${si}" onclick="flTogglePad(${ti},${si})"></div>`
-    ).join('')}</div>`;
+  let html = `
+    <div class="fl-toolbar">
+      <button class="fl-btn" id="fl-play" onclick="flToggle()">▶ Play</button>
+      <button class="fl-btn" onclick="flStop()">■ Stop</button>
+      <button class="fl-btn" onclick="flClear()">✕ Clear</button>
+      <span class="fl-bpm-label">BPM: <strong class="fl-bpm-val" id="fl-bpm">${flBPM}</strong></span>
+      <input type="range" min="60" max="200" value="${flBPM}" style="width:55px;cursor:pointer"
+        oninput="flSetBPM(this.value)">
+    </div>
+    <div class="fl-nums">
+      <div></div>
+      ${Array.from({length:FL_STEPS},(_,i) => `<div class="fl-num${i%4===0?' beat':''}">${i+1}</div>`).join('')}
+    </div>`;
+  FL_TRACKS.forEach((t, ti) => {
+    html += `<div class="fl-row">
+      <div class="fl-label">${t.name}</div>
+      ${Array.from({length:FL_STEPS},(_,si) =>
+        `<div class="fl-pad ${t.cls}${flPads[ti][si]?' on':''}" id="flp${ti}_${si}"
+              onclick="flTogglePad(${ti},${si})"></div>`).join('')}
+    </div>`;
   });
-  cont.innerHTML=h;
+  document.getElementById('fl-body').innerHTML = html;
 }
 
-function flTogglePad(ti,si) {
-  pads[ti][si]=!pads[ti][si];
-  const el=document.getElementById(`fp-${ti}-${si}`);
-  if(el) el.classList.toggle('active',pads[ti][si]);
+function flTogglePad(ti, si) {
+  flPads[ti][si] = !flPads[ti][si];
+  const el = document.getElementById(`flp${ti}_${si}`);
+  if (el) el.classList.toggle('on', flPads[ti][si]);
 }
-
-function flToggle() { flPlaying ? flStop() : flStart(); }
-
-function flStart() {
-  flPlaying=true;
-  const btn=document.getElementById('fl-play');
-  if(btn){btn.textContent='⏸ Pause';btn.classList.add('playing');}
-  if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-  flStep=0;
-  flInt=setInterval(()=>{flTick();flStep=(flStep+1)%STEPS;}, (60/flBPM/4)*1000);
+function flToggle() { flPlaying ? flStop() : flPlay(); }
+function flPlay() {
+  flPlaying = true;
+  const btn = document.getElementById('fl-play'); if (btn) { btn.textContent = '▐▐ Pause'; btn.classList.add('playing'); }
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  flStep = 0;
+  flTimer = setInterval(() => { flTick(); flStep = (flStep + 1) % FL_STEPS; }, (60 / flBPM / 4) * 1000);
 }
-
 function flStop() {
-  flPlaying=false; clearInterval(flInt); flStep=-1;
-  const btn=document.getElementById('fl-play');
-  if(btn){btn.textContent='▶ Play';btn.classList.remove('playing');}
-  document.querySelectorAll('.fl-pad.current').forEach(p=>p.classList.remove('current'));
+  flPlaying = false; clearInterval(flTimer); flStep = -1;
+  const btn = document.getElementById('fl-play'); if (btn) { btn.textContent = '▶ Play'; btn.classList.remove('playing'); }
+  document.querySelectorAll('.fl-pad.step').forEach(p => p.classList.remove('step'));
 }
-
-function flClear() { flStop(); pads=FL_TRACKS.map(()=>Array(STEPS).fill(false)); renderFL(); }
-
+function flClear() { flStop(); flPads = FL_TRACKS.map(() => Array(FL_STEPS).fill(false)); renderFL(); }
 function flSetBPM(v) {
-  flBPM=parseInt(v);
-  const el=document.getElementById('fl-bpm-disp');
-  if(el) el.textContent=flBPM;
-  if(flPlaying){flStop();flStart();}
+  flBPM = parseInt(v);
+  const el = document.getElementById('fl-bpm'); if (el) el.textContent = flBPM;
+  if (flPlaying) { flStop(); flPlay(); }
 }
-
 function flTick() {
-  const s=flStep;
-  document.querySelectorAll('.fl-pad').forEach(p=>p.classList.remove('current'));
-  FL_TRACKS.forEach((_,ti)=>{
-    const el=document.getElementById(`fp-${ti}-${s}`);
-    if(el) el.classList.add('current');
-    if(pads[ti][s]) playDrum(ti);
+  const s = flStep;
+  document.querySelectorAll('.fl-pad').forEach(p => p.classList.remove('step'));
+  FL_TRACKS.forEach((_, ti) => {
+    const el = document.getElementById(`flp${ti}_${s}`); if (el) el.classList.add('step');
+    if (flPads[ti][s]) flDrum(ti);
   });
 }
-
-function playDrum(ti) {
-  if(!audioCtx) return;
-  const now=audioCtx.currentTime;
-  if(ti===0) { // Kick
-    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+function flDrum(ti) {
+  if (!audioCtx) return;
+  const t = audioCtx.currentTime;
+  if (ti === 0) { // Kick
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
     o.connect(g); g.connect(audioCtx.destination);
-    o.frequency.setValueAtTime(150,now);
-    o.frequency.exponentialRampToValueAtTime(30,now+0.15);
-    g.gain.setValueAtTime(1,now); g.gain.exponentialRampToValueAtTime(0.001,now+0.3);
-    o.start(now); o.stop(now+0.3);
-  } else if(ti===1) { // Snare
-    const buf=audioCtx.createBuffer(1,audioCtx.sampleRate*0.15,audioCtx.sampleRate);
-    const d=buf.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
-    const src=audioCtx.createBufferSource(), g=audioCtx.createGain();
-    g.gain.setValueAtTime(0.5,now); g.gain.exponentialRampToValueAtTime(0.001,now+0.15);
-    src.buffer=buf; src.connect(g); g.connect(audioCtx.destination); src.start(now);
-  } else if(ti===2) { // Hi-hat
-    const buf=audioCtx.createBuffer(1,audioCtx.sampleRate*0.04,audioCtx.sampleRate);
-    const d=buf.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
-    const src=audioCtx.createBufferSource(), f=audioCtx.createBiquadFilter(), g=audioCtx.createGain();
+    o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(30, t+0.15);
+    g.gain.setValueAtTime(1, t); g.gain.exponentialRampToValueAtTime(0.001, t+0.3);
+    o.start(t); o.stop(t+0.3);
+  } else if (ti === 1) { // Snare
+    const buf = audioCtx.createBuffer(1, audioCtx.sampleRate*0.15, audioCtx.sampleRate);
+    const d = buf.getChannelData(0); for (let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+    const src = audioCtx.createBufferSource(), g = audioCtx.createGain();
+    g.gain.setValueAtTime(0.5,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.15);
+    src.buffer=buf; src.connect(g); g.connect(audioCtx.destination); src.start(t);
+  } else if (ti === 2) { // Hi-hat
+    const buf = audioCtx.createBuffer(1, audioCtx.sampleRate*0.04, audioCtx.sampleRate);
+    const d = buf.getChannelData(0); for (let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+    const src = audioCtx.createBufferSource(), f = audioCtx.createBiquadFilter(), g = audioCtx.createGain();
     f.type='highpass'; f.frequency.value=8000;
-    g.gain.setValueAtTime(0.25,now); g.gain.exponentialRampToValueAtTime(0.001,now+0.04);
-    src.buffer=buf; src.connect(f); f.connect(g); g.connect(audioCtx.destination); src.start(now);
-  } else if(ti===3) { // Bass
-    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    g.gain.setValueAtTime(0.25,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.04);
+    src.connect(f); f.connect(g); g.connect(audioCtx.destination); src.start(t);
+  } else { // Bass
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
     o.type='sine'; o.frequency.value=80;
-    g.gain.setValueAtTime(0.6,now); g.gain.exponentialRampToValueAtTime(0.001,now+0.25);
-    o.connect(g); g.connect(audioCtx.destination); o.start(now); o.stop(now+0.25);
+    g.gain.setValueAtTime(0.6,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.25);
+    o.connect(g); g.connect(audioCtx.destination); o.start(t); o.stop(t+0.25);
   }
 }
 
-// ═══════════════════════════════════════
-// BOOT SEQUENCE — open a few windows
-// ═══════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════
+//  BOOT — windows to open on load
+// ═══════════════════════════════════════════════════════
 window.addEventListener('load', () => {
-  openWindow('aim');
-  openWindow('diablo');
-  setTimeout(()=>openWindow('winamp'), 600);
-  setTimeout(()=>openWindow('mtg'), 1000);
-  setTimeout(()=>{ triggerError(); }, 3000);
+  openApp('aim');
+  openApp('d2');
+  setTimeout(() => openApp('wa'),  500);
+  setTimeout(() => openApp('mtg'), 900);
+  setTimeout(showError, 3500);
 });
 </script>
 
